@@ -26,43 +26,13 @@ export interface ScoreResult {
 
 export const QUESTIONS: Question[] = [
   {
-    cat: "Presence",
-    q: "How many social channels does your organization actively maintain?",
-    opts: [
-      ["None or just one", 0],
-      ["Two", 1],
-      ["Three to four", 2],
-      ["Five or more, each with a clear purpose", 3]
-    ]
-  },
-  {
-    cat: "Cadence",
-    q: "How often do you publish new content?",
-    opts: [
-      ["Rarely / ad hoc", 0],
-      ["A few times a month", 1],
-      ["Weekly", 2],
-      ["Several times a week, on a content calendar", 3]
-    ]
-  },
-  {
     cat: "Content",
-    q: "What best describes your content mix?",
+    q: "What best describes your clinical content mix?",
     opts: [
       ["Mostly announcements", 0],
       ["Announcements plus some health tips", 1],
       ["Educational content, stories and events", 2],
       ["Planned mix incl. video, patient stories and clinician voices", 3]
-    ]
-  },
-  {
-    cat: "Engagement",
-    q: "How quickly do you respond to comments and messages?",
-    opts: [
-      ["We usually don't", 0],
-      ["Within a week", 1],
-      ["Within 1–2 days", 2],
-      ["Same day, with a defined escalation path", 3]
     ]
   },
   {

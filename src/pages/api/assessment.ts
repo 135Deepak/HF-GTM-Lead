@@ -80,28 +80,60 @@ export const POST: APIRoute = async ({ request }) => {
       answers: answers.join(",")
     };
 
-    // Forward to Google Apps Script Webhook if configured
+    // Forward to Google Apps Script Webhook (compulsory)
     const webhookUrl =
+      (import.meta.env && (import.meta.env.GOOGLE_SHEETS_WEBHOOK_URL as string)) ||
       (typeof process !== "undefined" && process.env?.GOOGLE_SHEETS_WEBHOOK_URL) ||
       (typeof process !== "undefined" && process.env?.SHEET_WEBHOOK_URL) ||
       "";
 
-    let webhookSuccess = false;
-    if (webhookUrl) {
-      try {
-        const gasRes = await fetch(webhookUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(row)
-        });
-        webhookSuccess = gasRes.ok;
-      } catch (err) {
-        console.warn("[Google Apps Script] Webhook delivery notice:", err);
+    if (!webhookUrl) {
+      return new Response(
+        JSON.stringify({
+          ok: false,
+          reason: "Google Sheets integration is not configured. The GOOGLE_SHEETS_WEBHOOK_URL environment variable is required to record assessments."
+        }),
+        { status: 503, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    let gasData: any = null;
+    try {
+      const gasRes = await fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(row),
+        redirect: "follow"
+      });
+      gasData = await gasRes.json().catch(() => null);
+
+      if (!gasRes.ok || !gasData || gasData.result !== "success") {
+        const errorMsg = gasData?.error || "Google Sheets failed to confirm the saved assessment.";
+        return new Response(
+          JSON.stringify({ ok: false, reason: errorMsg }),
+          { status: 502, headers: { "Content-Type": "application/json" } }
+        );
       }
+    } catch (err: any) {
+      return new Response(
+        JSON.stringify({
+          ok: false,
+          reason: "Unable to connect to Google Sheets webhook: " + (err?.message || "network error")
+        }),
+        { status: 502, headers: { "Content-Type": "application/json" } }
+      );
     }
 
     return new Response(
-      JSON.stringify({ ok: true, row, recordedToSheet: webhookSuccess }),
+      JSON.stringify({
+        ok: true,
+        row: {
+          ...row,
+          sheet: gasData.sheet || "Assessments",
+          rowNumber: gasData.rowNumber
+        },
+        recordedToSheet: true
+      }),
       { status: 200, headers: { "Content-Type": "application/json" } }
     );
   } catch (err: any) {

@@ -156,20 +156,20 @@ export const LeadForm: React.FC = () => {
         body: JSON.stringify(payload)
       });
 
-      const data = await res.json();
-      if (!res.ok || !data.ok) {
-        setLeadError(data.reason || "Something went wrong sending your request. Please try again.");
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data?.ok) {
+        setLeadError(data?.reason || "Failed to record consultation request in Google Sheets. Please try again.");
         setSubmitting(false);
         return;
       }
 
       saveDetails({ ...details, source: "lead" });
       setSheetRowData(data.lead);
-      setRecordedToSheet(Boolean(data.recordedToSheet));
+      setRecordedToSheet(true);
       setLeadSuccess(true);
-      showToast("Response recorded successfully");
+      showToast("Response recorded to Google Sheet");
     } catch {
-      setLeadError("Something went wrong sending your request. Please try again.");
+      setLeadError("Unable to reach the server to save your request in Google Sheets. Please check your connection and try again.");
     } finally {
       setSubmitting(false);
     }
@@ -474,7 +474,7 @@ export const LeadForm: React.FC = () => {
               </div>
               {sheetRowData ? (
                 <div className="payload" id="leadPayload">
-                  {`// Record synced to: ${recordedToSheet ? "Google Sheet via Apps Script Webhook" : "Local ledger / API response"}\n` +
+                  {`// Confirmed saved to Google Sheet (${sheetRowData.sheet || "Leads"} tab, row #${sheetRowData.rowNumber || ""}):\n` +
                     `// "fit" is internal — computed server-side, never shown to the visitor\n` +
                     JSON.stringify(sheetRowData, null, 2)}
                 </div>

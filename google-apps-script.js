@@ -22,10 +22,20 @@
 
 function doPost(e) {
   var lock = LockService.getScriptLock();
-  // Wait up to 10 seconds for other write operations to finish
-  lock.tryLock(10000);
+  var hasLock = false;
 
   try {
+    // Wait up to 10 seconds for other write operations to finish
+    hasLock = lock.tryLock(10000);
+    if (!hasLock) {
+      return ContentService.createTextOutput(
+        JSON.stringify({
+          result: "error",
+          error: "Could not acquire script lock within 10 seconds. Server busy, please try again."
+        })
+      ).setMimeType(ContentService.MimeType.JSON);
+    }
+
     if (!e || !e.postData || !e.postData.contents) {
       return ContentService.createTextOutput(
         JSON.stringify({ result: "error", error: "Empty POST body" })
@@ -33,7 +43,18 @@ function doPost(e) {
     }
 
     var data = JSON.parse(e.postData.contents);
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
+
+    // Validate that only 'assessment' or 'lead' submissions are accepted
+    if (!data || (data.kind !== "assessment" && data.kind !== "lead")) {
+      return ContentService.createTextOutput(
+        JSON.stringify({
+          result: "error",
+          error: "Invalid submission kind. Expected 'assessment' or 'lead'."
+        })
+      ).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    var ss = SpreadsheetApp.openById("1TjBOZmm1pOSBE2iFG1FMlHd1YQFW4aJ6e-pi8q8RCLw");
 
     // Determine target sheet tab based on kind
     var sheetName = data.kind === "assessment" ? "Assessments" : "Leads";
@@ -54,10 +75,7 @@ function doPost(e) {
         "title",
         "score",
         "band",
-        "presence",
-        "cadence",
         "content",
-        "engagement",
         "measurement",
         "governance",
         "answers"
@@ -71,10 +89,7 @@ function doPost(e) {
         "company",
         "title",
         "orgType",
-        "facilities",
-        "role",
         "priorities",
-        "challenge",
         "timeline",
         "socialScore",
         "fit",
@@ -117,7 +132,9 @@ function doPost(e) {
     ).setMimeType(ContentService.MimeType.JSON);
 
   } finally {
-    lock.releaseLock();
+    if (hasLock) {
+      lock.releaseLock();
+    }
   }
 }
 

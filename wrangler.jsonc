@@ -8,6 +8,9 @@
 		"directory": "./dist",
 		"binding": "ASSETS"
 	},
+	"vars": {
+		"GOOGLE_SHEETS_WEBHOOK_URL": "https://script.google.com/macros/s/AKfycbxOf-p9TEq4JiwJBKBj0an_JY7-NO7bQMejZzNhMhqU2ieLGNQEL9_o60p4Ia--9aVT/exec"
+	},
 	"observability": {
 		"enabled": true
 	}

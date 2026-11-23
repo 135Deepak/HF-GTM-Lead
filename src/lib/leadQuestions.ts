@@ -20,18 +20,6 @@ export const LEAD_STEPS: LeadQuestion[][] = [
         "Diagnostics / lab network",
         "Payer, pharma or other"
       ]
-    },
-    {
-      id: "facilities",
-      label: "How many facilities or locations do you operate?",
-      type: "pills",
-      opts: ["1", "2–5", "6–20", "20+"]
-    },
-    {
-      id: "role",
-      label: "Which best describes your role?",
-      type: "pills",
-      opts: ["Leadership / C-suite", "Marketing", "Operations", "IT / digital", "Clinical"]
     }
   ],
   [
@@ -53,18 +41,6 @@ export const LEAD_STEPS: LeadQuestion[][] = [
       ]
     },
     {
-      id: "challenge",
-      label: "What's the biggest blocker today?",
-      type: "radio",
-      opts: [
-        "We don't know which channels bring patients",
-        "Not enough time or people to execute",
-        "Data is scattered across systems",
-        "Hard to prove ROI to leadership",
-        "Governance and compliance concerns slowing decisions"
-      ]
-    },
-    {
       id: "timeline",
       label: "When are you looking to get started?",
       type: "pills",
@@ -82,15 +58,6 @@ export function leadFit(a: { timeline?: string; facilities?: string; role?: stri
       "Budget approved": 3
     }[a.timeline ?? ""] ?? 0;
 
-  const f =
-    {
-      "1": 0,
-      "2–5": 1,
-      "6–20": 2,
-      "20+": 3
-    }[a.facilities ?? ""] ?? 0;
-
-  const r = a.role === "Leadership / C-suite" ? 2 : 1;
-  const s = t * 2 + f + r;
-  return s >= 8 ? "hot" : s >= 4 ? "warm" : "nurture";
+  const s = t * 3;
+  return s >= 8 ? "hot" : s >= 3 ? "warm" : "nurture";
 }
