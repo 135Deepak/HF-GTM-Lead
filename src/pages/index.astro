@@ -1,16 +1,75 @@
 ---
+import MainLayout from "../layouts/MainLayout.astro";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<MainLayout title="HealthFoundry — Intelligent Healthcare Growth Tools">
+  <section class="view active" data-view="/">
+    <div class="gtm-container">
+      <div class="hero">
+        <div class="hf-overline">Healthcare Growth Intelligence · Patient Acquisition Platform</div>
+        <h1>Turn your healthcare presence into <em>measurable patient growth.</em></h1>
+        <p>Purpose-built intelligence tools for healthcare systems, specialty practices, and diagnostic networks. Benchmark your digital authority in 3 minutes or collaborate with our healthcare growth specialists.</p>
+      </div>
+
+      <div class="tool-grid">
+        <a class="tool-card" href="/social-score">
+          <div class="tool-icon">
+            <svg><use href="#i-gauge"/></svg>
+          </div>
+          <div class="tool-meta">
+            <span class="chip teal">
+              <svg width="12" height="12"><use href="#i-clock"/></svg>3 min
+            </span>
+            <span class="chip">Growth Benchmark</span>
+          </div>
+          <h2>Healthcare Social Media Index</h2>
+          <p>Evaluate your brand across six clinical growth pillars — from doctor-patient storytelling and cadence to HIPAA-conscious governance and referral attribution. Instant score and tactical next steps.</p>
+          <span class="cta">
+            Start benchmark <svg><use href="#i-arrow"/></svg>
+          </span>
+        </a>
+
+        <a class="tool-card" href="/lead">
+          <div class="tool-icon">
+            <svg><use href="#i-users"/></svg>
+          </div>
+          <div class="tool-meta">
+            <span class="chip teal">
+              <svg width="12" height="12"><use href="#i-clock"/></svg>1 min
+            </span>
+            <span class="chip">Growth Consultation</span>
+          </div>
+          <h2>Connect with Growth Specialists</h2>
+          <p>Tell us what you're solving — patient acquisition, physician referrals, clinical brand authority, or conversion analytics. Receive a tailored GTM walkthrough and actionable next steps.</p>
+          <span class="cta">
+            Request consultation <svg><use href="#i-arrow"/></svg>
+          </span>
+        </a>
+      </div>
+
+      <div class="trust">
+        <span><svg><use href="#i-shieldCheck"/></svg>Verified healthcare organizations only</span>
+        <span><svg><use href="#i-checkCircle"/></svg>Zero spam · HIPAA-safe data handling</span>
+        <span><svg><use href="#i-checkCircle"/></svg>Instant diagnostic results in your browser</span>
+      </div>
+
+      <div class="platform-strip">
+        <div class="platform-item">
+          <div class="platform-icon">◉</div>
+          <strong>Vital360</strong>
+          <p>Patient acquisition, retention, engagement and care continuity — powered by AI agents.</p>
+        </div>
+        <div class="platform-item">
+          <div class="platform-icon">◆</div>
+          <strong>VitalStatistix</strong>
+          <p>Revenue cycle, claims, billing and FinOps optimization for healthcare operations.</p>
+        </div>
+        <div class="platform-item">
+          <div class="platform-icon">▲</div>
+          <strong>VitalRails</strong>
+          <p>Governance, risk and compliance processes for healthcare systems and networks.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</MainLayout>

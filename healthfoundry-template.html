@@ -1,0 +1,2390 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HealthFoundry — GTM tools</title>
+  <link rel="icon" href="assets/logo-mark.jpg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
+  <style>
+    /* ============================================================
+   HealthFoundry design tokens (subset of colors_and_type.css)
+   ============================================================ */
+    :root {
+      --background: 210 20% 98%;
+      --foreground: 215 25% 15%;
+      --card: 0 0% 100%;
+      --surface-sunken: 210 20% 96%;
+      --primary: 199 89% 32%;
+      --primary-foreground: 0 0% 100%;
+      --secondary: 210 18% 94%;
+      --secondary-foreground: 215 25% 27%;
+      --muted: 210 14% 93%;
+      --muted-foreground: 215 12% 52%;
+      --accent: 185 62% 64%;
+      --brand-navy: 228 96% 18%;
+      --brand-navy-ink: 228 96% 13%;
+      --brand-cyan: 185 62% 64%;
+      --destructive: 350 100% 56%;
+      --warning: 43 91% 51%;
+      --warning-foreground: 43 91% 15%;
+      --success: 156 91% 38%;
+      --border: 214 18% 89%;
+      --input: 214 18% 89%;
+      --ring: 199 89% 32%;
+
+      --radius: 0.625rem;
+      --radius-sm: 0.375rem;
+      --radius-md: 0.5rem;
+      --radius-xl: 0.75rem;
+      --radius-2xl: 1rem;
+      --radius-full: 9999px;
+
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.25rem;
+      --space-6: 1.5rem;
+      --space-8: 2rem;
+      --space-12: 3rem;
+
+      --shadow-sm: 0 1px 2px 0 hsl(var(--foreground) / 0.04);
+      --shadow-hover-medium: 0 2px 12px hsl(var(--foreground) / 0.08);
+      --shadow-xl: 0 10px 24px -4px hsl(var(--foreground) / 0.14);
+
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --dur-fast: 150ms;
+      --dur-base: 200ms;
+      --dur-slow: 300ms;
+
+      --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --fs-mini: 0.6875rem;
+      --fs-xs: 0.75rem;
+      --fs-sm: 0.875rem;
+      --fs-base: 1rem;
+      --fs-lg: 1.125rem;
+      --fs-xl: 1.25rem;
+      --fs-2xl: 1.5rem;
+      --fs-3xl: 1.875rem;
+      --fs-4xl: 2.25rem;
+      --tracking-tight: -0.015em;
+      --tracking-wider: 0.05em;
+    }
+
+    .dark {
+      --background: 215 28% 10%;
+      --foreground: 210 20% 92%;
+      --card: 215 25% 13%;
+      --surface-sunken: 215 28% 8%;
+      --primary: 199 80% 48%;
+      --primary-foreground: 215 28% 10%;
+      --secondary: 215 20% 18%;
+      --secondary-foreground: 210 20% 92%;
+      --muted: 215 18% 20%;
+      --muted-foreground: 215 14% 65%;
+      --accent: 185 45% 55%;
+      --destructive: 350 100% 62%;
+      --warning: 43 91% 58%;
+      --success: 156 85% 46%;
+      --border: 215 18% 22%;
+      --input: 215 18% 22%;
+      --ring: 199 80% 48%;
+      --brand-navy: 228 96% 24%;
+    }
+
+    /* ============================================================
+   Base
+   ============================================================ */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      font-family: var(--font-sans);
+      color: hsl(var(--foreground));
+      background: hsl(var(--background));
+      -webkit-font-smoothing: antialiased;
+      letter-spacing: var(--tracking-tight);
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-weight: 600;
+      line-height: 1.3;
+      margin: 0;
+      text-wrap: balance;
+    }
+
+    p {
+      margin: 0;
+      text-wrap: pretty;
+    }
+
+    a {
+      color: hsl(var(--primary));
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .hf-num {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .hf-overline {
+      font-size: var(--fs-mini);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-wider);
+      color: hsl(var(--muted-foreground));
+    }
+
+    :focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring));
+    }
+
+    /* ============================================================
+   Shell
+   ============================================================ */
+    .gtm-header {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: hsl(var(--card) / 0.9);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid hsl(var(--border));
+    }
+
+    .gtm-header-inner,
+    .gtm-container {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 var(--space-4);
+    }
+
+    .gtm-header-inner {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      gap: var(--space-6);
+    }
+
+    .gtm-logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .gtm-logo img {
+      height: 24px;
+      display: block;
+    }
+
+    .gtm-logo .logo-dark {
+      display: none;
+    }
+
+    .dark .gtm-logo .logo-light {
+      display: none;
+    }
+
+    .dark .gtm-logo .logo-dark {
+      display: block;
+    }
+
+    .gtm-nav {
+      display: flex;
+      gap: var(--space-1);
+      margin-left: auto;
+    }
+
+    .gtm-nav a {
+      font-size: var(--fs-sm);
+      font-weight: 500;
+      text-decoration: none;
+      color: hsl(var(--muted-foreground));
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-md);
+      transition: background var(--dur-fast), color var(--dur-fast);
+    }
+
+    .gtm-nav a:hover {
+      background: hsl(var(--secondary));
+      color: hsl(var(--foreground));
+    }
+
+    .gtm-nav a.active {
+      color: hsl(var(--primary));
+      background: hsl(var(--primary) / 0.08);
+    }
+
+    .gtm-iconbtn {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border: 1px solid hsl(var(--border));
+      border-radius: var(--radius-md);
+      background: transparent;
+      color: hsl(var(--muted-foreground));
+      cursor: pointer;
+    }
+
+    .gtm-iconbtn:hover {
+      background: hsl(var(--secondary));
+      color: hsl(var(--foreground));
+    }
+
+    .gtm-iconbtn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .gtm-iconbtn .i-moon {
+      display: none;
+    }
+
+    .dark .gtm-iconbtn .i-sun {
+      display: none;
+    }
+
+    .dark .gtm-iconbtn .i-moon {
+      display: block;
+    }
+
+    .gtm-footer {
+      border-top: 1px solid hsl(var(--border));
+      margin-top: var(--space-12);
+      padding: var(--space-6) 0;
+      font-size: var(--fs-xs);
+      color: hsl(var(--muted-foreground));
+    }
+
+    .gtm-footer .gtm-container {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .view {
+      display: none;
+      animation: fade var(--dur-slow) var(--ease-out);
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    @keyframes fade {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* ============================================================
+   Buttons
+   ============================================================ */
+    .hf-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      height: 40px;
+      padding: 0 var(--space-5);
+      border-radius: var(--radius-md);
+      border: 1px solid transparent;
+      font-size: var(--fs-sm);
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background var(--dur-fast), border-color var(--dur-fast), opacity var(--dur-fast);
+    }
+
+    .hf-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .hf-btn.primary {
+      background: hsl(var(--primary));
+      color: hsl(var(--primary-foreground));
+    }
+
+    .hf-btn.primary:hover {
+      background: hsl(var(--primary) / 0.9);
+    }
+
+    .hf-btn.outline {
+      background: transparent;
+      border-color: hsl(var(--border));
+      color: hsl(var(--foreground));
+    }
+
+    .hf-btn.outline:hover {
+      background: hsl(var(--secondary));
+    }
+
+    .hf-btn.ghost {
+      background: transparent;
+      color: hsl(var(--muted-foreground));
+    }
+
+    .hf-btn.ghost:hover {
+      background: hsl(var(--secondary));
+      color: hsl(var(--foreground));
+    }
+
+    .hf-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .hf-btn.loading {
+      pointer-events: none;
+      opacity: 0.8;
+    }
+
+    .spinner {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid currentColor;
+      border-right-color: transparent;
+      animation: spin 700ms linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* ============================================================
+   Landing
+   ============================================================ */
+    .hero {
+      padding: var(--space-12) 0 var(--space-8);
+      text-align: center;
+    }
+
+    .hero .hf-overline {
+      color: hsl(var(--primary));
+    }
+
+    .hero h1 {
+      font-size: clamp(1.75rem, 4vw, var(--fs-4xl));
+      margin: var(--space-3) auto var(--space-4);
+      max-width: 720px;
+      letter-spacing: -0.02em;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: hsl(var(--primary));
+    }
+
+    .hero p {
+      font-size: var(--fs-base);
+      color: hsl(var(--muted-foreground));
+      max-width: 580px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--space-6);
+      margin-top: var(--space-8);
+    }
+
+    .tool-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+      padding: var(--space-8) var(--space-6) var(--space-6);
+      background: hsl(var(--card));
+      border: 1px solid hsl(var(--border));
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+      text-decoration: none;
+      color: inherit;
+      overflow: hidden;
+      transition: box-shadow var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out), border-color var(--dur-base);
+    }
+
+    .tool-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 4px;
+      background: linear-gradient(90deg, hsl(var(--brand-navy)), hsl(var(--primary)), hsl(var(--brand-cyan)));
+    }
+
+    .tool-card:hover {
+      box-shadow: var(--shadow-xl);
+      transform: translateY(-2px);
+      border-color: hsl(var(--primary) / 0.4);
+    }
+
+    .tool-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-xl);
+      display: grid;
+      place-items: center;
+      background: hsl(var(--primary) / 0.1);
+      color: hsl(var(--primary));
+    }
+
+    .tool-icon svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .tool-card h2 {
+      font-size: var(--fs-xl);
+    }
+
+    .tool-card p {
+      font-size: var(--fs-sm);
+      color: hsl(var(--muted-foreground));
+      line-height: 1.6;
+    }
+
+    .tool-meta {
+      display: flex;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      height: 24px;
+      padding: 0 var(--space-3);
+      border-radius: var(--radius-full);
+      font-size: var(--fs-mini);
+      font-weight: 500;
+      background: hsl(var(--secondary));
+      color: hsl(var(--secondary-foreground));
+    }
+
+    .chip.navy {
+      background: hsl(var(--brand-navy));
+      color: hsl(0 0% 100%);
+    }
+
+    .chip.teal {
+      background: hsl(var(--accent) / 0.18);
+      color: hsl(var(--primary));
+    }
+
+    .tool-card .cta {
+      margin-top: auto;
+      padding-top: var(--space-2);
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--fs-sm);
+      font-weight: 600;
+      color: hsl(var(--primary));
+    }
+
+    .tool-card .cta svg {
+      width: 16px;
+      height: 16px;
+      transition: transform var(--dur-base) var(--ease-out);
+    }
+
+    .tool-card:hover .cta svg {
+      transform: translateX(3px);
+    }
+
+    .trust {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-6);
+      flex-wrap: wrap;
+      margin-top: var(--space-8);
+      font-size: var(--fs-xs);
+      color: hsl(var(--muted-foreground));
+    }
+
+    .trust span {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .trust svg {
+      width: 14px;
+      height: 14px;
+      color: hsl(var(--success));
+    }
+
+    /* ============================================================
+   Tool page layout
+   ============================================================ */
+    .page-head {
+      padding: var(--space-8) 0 var(--space-6);
+    }
+
+    .back {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      font-size: var(--fs-sm);
+      color: hsl(var(--muted-foreground));
+      text-decoration: none;
+      margin-bottom: var(--space-4);
+    }
+
+    .back:hover {
+      color: hsl(var(--foreground));
+    }
+
+    .back svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .page-head h1 {
+      font-size: var(--fs-2xl);
+      letter-spacing: -0.02em;
+    }
+
+    .page-head p {
+      margin-top: var(--space-2);
+      font-size: var(--fs-sm);
+      color: hsl(var(--muted-foreground));
+    }
+
+    .tool-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: var(--space-6);
+      align-items: start;
+    }
+
+    @media (max-width: 860px) {
+      .tool-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .tool-aside {
+        order: -1;
+      }
+    }
+
+    .panel {
+      background: hsl(var(--card));
+      border: 1px solid hsl(var(--border));
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .panel-body {
+      padding: var(--space-6);
+    }
+
+    .panel-foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-4) var(--space-6);
+      border-top: 1px solid hsl(var(--border));
+      background: hsl(var(--surface-sunken));
+      border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+    }
+
+    .tool-aside .panel-body {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    .aside-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .aside-list li {
+      display: flex;
+      gap: var(--space-3);
+      font-size: var(--fs-sm);
+      line-height: 1.5;
+    }
+
+    .aside-list svg {
+      width: 16px;
+      height: 16px;
+      flex: none;
+      margin-top: 2px;
+      color: hsl(var(--primary));
+    }
+
+    /* Stepper */
+    .stepper {
+      display: flex;
+      gap: var(--space-2);
+      margin-bottom: var(--space-6);
+    }
+
+    .step {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      font-size: var(--fs-xs);
+      font-weight: 500;
+      color: hsl(var(--muted-foreground));
+    }
+
+    .step .bar {
+      height: 4px;
+      border-radius: var(--radius-full);
+      background: hsl(var(--muted));
+      overflow: hidden;
+    }
+
+    .step .bar i {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: hsl(var(--primary));
+      transition: width var(--dur-slow) var(--ease-out);
+    }
+
+    .step.done .bar i,
+    .step.current .bar i {
+      width: 100%;
+    }
+
+    .step.current {
+      color: hsl(var(--foreground));
+    }
+
+    /* Questions */
+    .q-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: var(--space-2);
+    }
+
+    .q-title {
+      font-size: var(--fs-lg);
+      margin-bottom: var(--space-5);
+    }
+
+    .options {
+      display: grid;
+      gap: var(--space-3);
+    }
+
+    .option {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-4);
+      cursor: pointer;
+      border: 1px solid hsl(var(--border));
+      border-radius: var(--radius);
+      background: hsl(var(--card));
+      font-size: var(--fs-sm);
+      text-align: left;
+      color: inherit;
+      transition: border-color var(--dur-fast), background var(--dur-fast);
+    }
+
+    .option:hover {
+      border-color: hsl(var(--primary) / 0.5);
+      background: hsl(var(--primary) / 0.03);
+    }
+
+    .option .radio {
+      width: 18px;
+      height: 18px;
+      flex: none;
+      border-radius: 50%;
+      border: 2px solid hsl(var(--border));
+      display: grid;
+      place-items: center;
+    }
+
+    .option.selected {
+      border-color: hsl(var(--primary));
+      background: hsl(var(--primary) / 0.06);
+    }
+
+    .option.selected .radio {
+      border-color: hsl(var(--primary));
+    }
+
+    .option.selected .radio::after {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: hsl(var(--primary));
+    }
+
+    /* Forms */
+    .sec {
+      margin: 0 0 var(--space-4);
+    }
+
+    .fields {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    .row2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+    }
+
+    @media (max-width: 560px) {
+      .row2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .f {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .f label {
+      font-size: var(--fs-xs);
+      font-weight: 500;
+    }
+
+    .f label .req {
+      color: hsl(var(--destructive));
+      margin-left: 2px;
+    }
+
+    .input,
+    .select,
+    .textarea {
+      width: 100%;
+      height: 40px;
+      padding: 0 var(--space-3);
+      font: inherit;
+      font-size: var(--fs-sm);
+      color: hsl(var(--foreground));
+      background: hsl(var(--card));
+      border: 1px solid hsl(var(--input));
+      border-radius: var(--radius);
+      transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
+    }
+
+    .textarea {
+      height: auto;
+      min-height: 96px;
+      padding: var(--space-3);
+      resize: vertical;
+    }
+
+    .input::placeholder,
+    .textarea::placeholder {
+      color: hsl(var(--muted-foreground));
+    }
+
+    .input:focus,
+    .select:focus,
+    .textarea:focus {
+      outline: none;
+      border-color: hsl(var(--ring));
+      box-shadow: 0 0 0 3px hsl(var(--ring) / 0.15);
+    }
+
+    .f.invalid .input {
+      border-color: hsl(var(--destructive));
+    }
+
+    .f.invalid .input:focus {
+      box-shadow: 0 0 0 3px hsl(var(--destructive) / 0.15);
+    }
+
+    .f.valid .input {
+      border-color: hsl(var(--success));
+    }
+
+    .hint {
+      font-size: var(--fs-xs);
+      color: hsl(var(--muted-foreground));
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      min-height: 16px;
+    }
+
+    .hint svg {
+      width: 14px;
+      height: 14px;
+      flex: none;
+    }
+
+    .f.invalid .hint {
+      color: hsl(var(--destructive));
+    }
+
+    .f.valid .hint {
+      color: hsl(var(--success));
+    }
+
+    .checkline {
+      display: flex;
+      gap: var(--space-3);
+      align-items: flex-start;
+      font-size: var(--fs-xs);
+      color: hsl(var(--muted-foreground));
+      line-height: 1.5;
+    }
+
+    .checkline input {
+      margin-top: 2px;
+      accent-color: hsl(var(--primary));
+    }
+
+    .callout {
+      display: flex;
+      gap: var(--space-3);
+      padding: var(--space-4);
+      border-radius: var(--radius);
+      font-size: var(--fs-sm);
+      line-height: 1.5;
+      background: hsl(var(--primary) / 0.06);
+      border: 1px solid hsl(var(--primary) / 0.2);
+    }
+
+    .callout svg {
+      width: 18px;
+      height: 18px;
+      flex: none;
+      color: hsl(var(--primary));
+      margin-top: 1px;
+    }
+
+    .callout.error {
+      background: hsl(var(--destructive) / 0.06);
+      border-color: hsl(var(--destructive) / 0.25);
+    }
+
+    .callout.error svg {
+      color: hsl(var(--destructive));
+    }
+
+    /* Locked result preview */
+    .locked {
+      position: relative;
+      padding: var(--space-5);
+      margin-bottom: var(--space-6);
+      border: 1px dashed hsl(var(--border));
+      border-radius: var(--radius);
+      background: hsl(var(--surface-sunken));
+      overflow: hidden;
+    }
+
+    .locked .blur {
+      filter: blur(6px);
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: var(--space-5);
+    }
+
+    .locked .lock-msg {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      font-size: var(--fs-sm);
+      font-weight: 600;
+    }
+
+    .locked .lock-msg svg {
+      width: 16px;
+      height: 16px;
+      color: hsl(var(--primary));
+    }
+
+    /* Result */
+    .result-top {
+      display: flex;
+      gap: var(--space-8);
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .ring {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      flex: none;
+    }
+
+    .ring svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .ring .track {
+      stroke: hsl(var(--muted));
+    }
+
+    .ring .val {
+      stroke: hsl(var(--primary));
+      stroke-linecap: round;
+      transition: stroke-dashoffset 900ms var(--ease-out);
+    }
+
+    .ring .center {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      text-align: center;
+    }
+
+    .ring .score {
+      font-size: 2.5rem;
+      font-weight: 600;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .ring .of {
+      font-size: var(--fs-xs);
+      color: hsl(var(--muted-foreground));
+      margin-top: var(--space-1);
+    }
+
+    .band {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      height: 28px;
+      padding: 0 var(--space-3);
+      border-radius: var(--radius-full);
+      font-size: var(--fs-xs);
+      font-weight: 600;
+    }
+
+    .band::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .band.low {
+      background: hsl(var(--destructive) / 0.1);
+      color: hsl(var(--destructive));
+    }
+
+    .band.growing {
+      background: hsl(var(--warning) / 0.15);
+      color: hsl(var(--warning-foreground));
+    }
+
+    .dark .band.growing {
+      color: hsl(var(--warning));
+    }
+
+    .band.strong {
+      background: hsl(var(--success) / 0.12);
+      color: hsl(var(--success));
+    }
+
+    .result-summary h2 {
+      font-size: var(--fs-xl);
+      margin: var(--space-3) 0 var(--space-2);
+    }
+
+    .result-summary p {
+      font-size: var(--fs-sm);
+      color: hsl(var(--muted-foreground));
+      line-height: 1.6;
+      max-width: 440px;
+    }
+
+    .breakdown {
+      margin-top: var(--space-8);
+      display: grid;
+      gap: var(--space-3);
+    }
+
+    .bd-row {
+      display: grid;
+      grid-template-columns: 150px 1fr 48px;
+      gap: var(--space-3);
+      align-items: center;
+      font-size: var(--fs-sm);
+    }
+
+    .bd-bar {
+      height: 8px;
+      border-radius: var(--radius-full);
+      background: hsl(var(--muted));
+      overflow: hidden;
+    }
+
+    .bd-bar i {
+      display: block;
+      height: 100%;
+      background: hsl(var(--primary));
+      border-radius: inherit;
+      transition: width 900ms var(--ease-out);
+    }
+
+    .bd-row .hf-num {
+      text-align: right;
+      color: hsl(var(--muted-foreground));
+      font-size: var(--fs-xs);
+    }
+
+    @media (max-width: 560px) {
+      .bd-row {
+        grid-template-columns: 110px 1fr 40px;
+      }
+    }
+
+    .pointers {
+      margin-top: var(--space-8);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-3);
+    }
+
+    .pointer {
+      padding: var(--space-4);
+      border-radius: var(--radius);
+      border: 1px solid hsl(var(--border));
+      background: hsl(var(--surface-sunken));
+    }
+
+    .pointer .n {
+      width: 24px;
+      height: 24px;
+      border-radius: var(--radius-full);
+      display: grid;
+      place-items: center;
+      background: hsl(var(--primary));
+      color: hsl(var(--primary-foreground));
+      font-size: var(--fs-xs);
+      font-weight: 600;
+      margin-bottom: var(--space-3);
+    }
+
+    .pointer h3 {
+      font-size: var(--fs-sm);
+      margin-bottom: var(--space-1);
+    }
+
+    .pointer p {
+      font-size: var(--fs-xs);
+      color: hsl(var(--muted-foreground));
+      line-height: 1.55;
+    }
+
+    /* Success state */
+    .success {
+      text-align: center;
+      padding: var(--space-12) var(--space-6);
+    }
+
+    .success .badge {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto var(--space-5);
+      border-radius: var(--radius-full);
+      display: grid;
+      place-items: center;
+      background: hsl(var(--success) / 0.12);
+      color: hsl(var(--success));
+    }
+
+    .success .badge svg {
+      width: 32px;
+      height: 32px;
+    }
+
+    .success h2 {
+      font-size: var(--fs-xl);
+      margin-bottom: var(--space-2);
+    }
+
+    .success p {
+      font-size: var(--fs-sm);
+      color: hsl(var(--muted-foreground));
+      max-width: 420px;
+      margin: 0 auto var(--space-6);
+      line-height: 1.6;
+    }
+
+    .success .actions {
+      display: flex;
+      gap: var(--space-3);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .payload {
+      margin-top: var(--space-6);
+      text-align: left;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: var(--fs-mini);
+      padding: var(--space-4);
+      border-radius: var(--radius);
+      background: hsl(var(--surface-sunken));
+      border: 1px solid hsl(var(--border));
+      color: hsl(var(--secondary-foreground));
+      white-space: pre-wrap;
+      overflow-x: auto;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: var(--space-6);
+      transform: translate(-50%, 20px);
+      background: hsl(var(--foreground));
+      color: hsl(var(--background));
+      padding: var(--space-3) var(--space-5);
+      border-radius: var(--radius-md);
+      font-size: var(--fs-sm);
+      box-shadow: var(--shadow-xl);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--dur-base), transform var(--dur-base) var(--ease-out);
+      z-index: 60;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .mock-flag {
+      font-size: var(--fs-mini);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-wider);
+      padding: 2px var(--space-2);
+      border-radius: var(--radius-sm);
+      background: hsl(var(--warning) / 0.18);
+      color: hsl(var(--warning-foreground));
+    }
+
+    .dark .mock-flag {
+      color: hsl(var(--warning));
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Small button */
+    .hf-btn.sm {
+      height: 32px;
+      padding: 0 var(--space-3);
+      font-size: var(--fs-xs);
+    }
+
+    .hf-btn.sm svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* Known-details summary (PersonalDetails prefilled state) */
+    .known {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-4);
+      border-radius: var(--radius);
+      border: 1px solid hsl(var(--border));
+      background: hsl(var(--surface-sunken));
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border-radius: var(--radius-full);
+      display: grid;
+      place-items: center;
+      font-size: var(--fs-sm);
+      font-weight: 600;
+      background: hsl(var(--brand-navy));
+      color: hsl(0 0% 100%);
+    }
+
+    .known-text {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .known-name {
+      font-size: var(--fs-sm);
+      font-weight: 600;
+    }
+
+    .known-sub {
+      font-size: var(--fs-xs);
+      color: hsl(var(--muted-foreground));
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .known-note {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-top: var(--space-2);
+      font-size: var(--fs-xs);
+      color: hsl(var(--muted-foreground));
+    }
+
+    .known-note svg {
+      width: 14px;
+      height: 14px;
+      color: hsl(var(--success));
+    }
+
+    /* Lead questionnaire */
+    .qblock+.qblock {
+      margin-top: var(--space-6);
+      padding-top: var(--space-6);
+      border-top: 1px solid hsl(var(--border));
+    }
+
+    .qlabel {
+      font-size: var(--fs-sm);
+      font-weight: 600;
+      margin-bottom: var(--space-3);
+    }
+
+    .qlabel .opt {
+      font-weight: 400;
+      color: hsl(var(--muted-foreground));
+    }
+
+    .options.cols2 {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media (max-width: 560px) {
+      .options.cols2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .option .box {
+      width: 18px;
+      height: 18px;
+      flex: none;
+      border-radius: var(--radius-sm);
+      border: 2px solid hsl(var(--border));
+      display: grid;
+      place-items: center;
+      color: hsl(var(--primary-foreground));
+    }
+
+    .option .box svg {
+      width: 12px;
+      height: 12px;
+      opacity: 0;
+    }
+
+    .option.selected .box {
+      background: hsl(var(--primary));
+      border-color: hsl(var(--primary));
+    }
+
+    .option.selected .box svg {
+      opacity: 1;
+    }
+
+    .pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+
+    .pill {
+      height: 36px;
+      padding: 0 var(--space-4);
+      border-radius: var(--radius-full);
+      border: 1px solid hsl(var(--border));
+      background: hsl(var(--card));
+      color: inherit;
+      font-size: var(--fs-sm);
+      cursor: pointer;
+      transition: all var(--dur-fast);
+    }
+
+    .pill:hover {
+      border-color: hsl(var(--primary) / 0.5);
+    }
+
+    .pill.selected {
+      background: hsl(var(--primary));
+      border-color: hsl(var(--primary));
+      color: hsl(var(--primary-foreground));
+    }
+
+    .qerr {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      margin-top: var(--space-2);
+      font-size: var(--fs-xs);
+      color: hsl(var(--destructive));
+    }
+
+    .qerr svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* Mock-only: saved sheet row disclosure */
+    .mock-row {
+      margin-top: var(--space-8);
+    }
+
+    .mock-row summary {
+      cursor: pointer;
+      font-size: var(--fs-xs);
+      font-weight: 500;
+      color: hsl(var(--muted-foreground));
+    }
+
+    .mock-row summary:hover {
+      color: hsl(var(--foreground));
+    }
+
+    .mock-row .payload {
+      margin-top: var(--space-3);
+    }
+
+    /* Aside score card */
+    .mini-score {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3);
+      border-radius: var(--radius);
+      background: hsl(var(--surface-sunken));
+      border: 1px solid hsl(var(--border));
+    }
+
+    .mini-score .hf-num {
+      font-size: var(--fs-2xl);
+      font-weight: 600;
+      line-height: 1;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- SVG icon sprite (mirrors <Icon name="…"/> names) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-gauge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <path d="m12 14 4-4" />
+      <path d="M3.34 19a10 10 0 1 1 17.32 0" />
+    </symbol>
+    <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <path d="M5 12h14" />
+      <path d="m12 5 7 7-7 7" />
+    </symbol>
+    <symbol id="i-arrowLeft" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5" />
+      <path d="m12 19-7-7 7-7" />
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+      stroke-linejoin="round">
+      <path d="M20 6 9 17l-5-5" />
+    </symbol>
+    <symbol id="i-checkCircle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+      <path d="m9 11 3 3L22 4" />
+    </symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 8v4" />
+      <path d="M12 16h.01" />
+    </symbol>
+    <symbol id="i-shieldCheck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      <path d="m9 12 2 2 4-4" />
+    </symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </symbol>
+    <symbol id="i-trendUp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <path d="m22 7-8.5 8.5-5-5L2 17" />
+      <path d="M16 7h6v6" />
+    </symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <circle cx="12" cy="12" r="4" />
+      <path
+        d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+    </symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+    </symbol>
+    <symbol id="i-pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+    </symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 6v6l4 2" />
+    </symbol>
+  </svg>
+
+  <header class="gtm-header">
+    <div class="gtm-header-inner">
+      <a href="#/" class="gtm-logo" aria-label="HealthFoundry home">
+        <img class="logo-light" src="assets/logo-wordmark-horizontal.jpg" alt="HealthFoundry" />
+        <img class="logo-dark" src="assets/logo-wordmark-horizontal-dark.jpg" alt="HealthFoundry" />
+      </a>
+      <span class="mock-flag"></span>
+      <nav class="gtm-nav" aria-label="Tools">
+        <a href="#/social-score" data-route="/social-score">Social score</a>
+        <a href="#/lead" data-route="/lead">Talk to us</a>
+      </nav>
+      <button class="gtm-iconbtn" id="themeToggle" aria-label="Toggle dark mode">
+        <svg class="i-sun">
+          <use href="#i-sun" />
+        </svg>
+        <svg class="i-moon">
+          <use href="#i-moon" />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ======================= LANDING  (/) ======================= -->
+    <section class="view" data-view="/">
+      <div class="gtm-container">
+        <div class="hero">
+          <div class="hf-overline">HealthFoundry for healthcare growth teams</div>
+          <h1>See where you stand. <em>Then let's grow it.</em></h1>
+          <p>Two quick tools for healthcare organizations — benchmark your social media presence in a few minutes, or
+            tell us what you're working on and we'll get back to you.</p>
+        </div>
+
+        <div class="tool-grid">
+          <a class="tool-card" href="#/social-score">
+            <div class="tool-icon"><svg>
+                <use href="#i-gauge" />
+              </svg></div>
+            <div class="tool-meta">
+              <span class="chip teal"><svg width="12" height="12">
+                  <use href="#i-clock" />
+                </svg>3 min</span>
+              <span class="chip">Self-assessment</span>
+            </div>
+            <h2>Know your social media score</h2>
+            <p>Answer six questions about your channels, cadence and engagement. Get a score out of 100, a maturity
+              band, and practical next steps.</p>
+            <span class="cta">Start assessment <svg>
+                <use href="#i-arrow" />
+              </svg></span>
+          </a>
+
+          <a class="tool-card" href="#/lead">
+            <div class="tool-icon"><svg>
+                <use href="#i-users" />
+              </svg></div>
+            <div class="tool-meta">
+              <span class="chip teal"><svg width="12" height="12">
+                  <use href="#i-clock" />
+                </svg>1 min</span>
+              <span class="chip">Lead generation</span>
+            </div>
+            <h2>Talk to our team</h2>
+            <p>Tell us what you're trying to solve — patient acquisition, referrals, brand or analytics — and a
+              HealthFoundry specialist will reach out.</p>
+            <span class="cta">Get in touch <svg>
+                <use href="#i-arrow" />
+              </svg></span>
+          </a>
+        </div>
+
+        <div class="trust">
+          <span><svg>
+              <use href="#i-shieldCheck" />
+            </svg>Organization emails only</span>
+          <span><svg>
+              <use href="#i-checkCircle" />
+            </svg>No credit card, no spam</span>
+          <span><svg>
+              <use href="#i-checkCircle" />
+            </svg>Results instantly in your browser</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SOCIAL SCORE  (/social-score) ==================== -->
+    <section class="view" data-view="/social-score">
+      <div class="gtm-container">
+        <div class="page-head">
+          <a href="#/" class="back"><svg>
+              <use href="#i-arrowLeft" />
+            </svg>All tools</a>
+          <h1>Know your social media score</h1>
+          <p>A quick self-assessment. Your score is calculated in your browser.</p>
+        </div>
+
+        <div class="tool-layout">
+          <div>
+            <div class="stepper" id="scoreStepper">
+              <div class="step" data-step="0"><span>1. Questions</span>
+                <div class="bar"><i></i></div>
+              </div>
+              <div class="step" data-step="1"><span>2. Your details</span>
+                <div class="bar"><i></i></div>
+              </div>
+              <div class="step" data-step="2"><span>3. Your score</span>
+                <div class="bar"><i></i></div>
+              </div>
+            </div>
+
+            <!-- Step 1: questions -->
+            <div class="panel" id="qPanel">
+              <div class="panel-body">
+                <div class="q-meta">
+                  <span class="hf-overline" id="qCategory">Presence</span>
+                  <span class="hf-num" style="font-size:var(--fs-xs);color:hsl(var(--muted-foreground))" id="qCount">1 /
+                    6</span>
+                </div>
+                <h2 class="q-title" id="qTitle"></h2>
+                <div class="options" id="qOptions" role="radiogroup"></div>
+              </div>
+              <div class="panel-foot">
+                <button class="hf-btn ghost" id="qBack"><svg>
+                    <use href="#i-arrowLeft" />
+                  </svg>Back</button>
+                <button class="hf-btn primary" id="qNext" disabled>Next<svg>
+                    <use href="#i-arrow" />
+                  </svg></button>
+              </div>
+            </div>
+
+            <!-- Step 2: gate -->
+            <div class="panel hidden" id="gatePanel">
+              <form class="panel-body" id="gateForm" novalidate>
+                <div class="locked" aria-hidden="true">
+                  <div class="blur">
+                    <div style="font-size:2.5rem;font-weight:600">72</div>
+                    <div>
+                      <div class="band strong">Strong</div>
+                      <p style="margin-top:8px;font-size:var(--fs-sm)">Your social presence is ahead of most peers…</p>
+                    </div>
+                  </div>
+                  <div class="lock-msg"><svg>
+                      <use href="#i-lock" />
+                    </svg>Your score is ready — enter your details to unlock it</div>
+                </div>
+                <div data-personal-details="score"></div>
+                <p class="known-note" style="margin-top:var(--space-4)">By continuing, you agree HealthFoundry may
+                  contact you about your results.</p>
+                <div class="callout error hidden" id="gateError" style="margin-top:var(--space-4)"><svg>
+                    <use href="#i-alert" />
+                  </svg><span></span></div>
+              </form>
+              <div class="panel-foot">
+                <button class="hf-btn ghost" id="gateBack" type="button"><svg>
+                    <use href="#i-arrowLeft" />
+                  </svg>Back</button>
+                <button class="hf-btn primary" type="submit" form="gateForm" id="gateSubmit">Reveal my score<svg>
+                    <use href="#i-arrow" />
+                  </svg></button>
+              </div>
+            </div>
+
+            <!-- Step 3: result -->
+            <div class="panel hidden" id="resultPanel">
+              <div class="panel-body">
+                <div class="result-top">
+                  <div class="ring">
+                    <svg viewBox="0 0 120 120">
+                      <circle class="track" cx="60" cy="60" r="52" fill="none" stroke-width="10" />
+                      <circle class="val" id="ringVal" cx="60" cy="60" r="52" fill="none" stroke-width="10"
+                        stroke-dasharray="326.73" stroke-dashoffset="326.73" />
+                    </svg>
+                    <div class="center">
+                      <div>
+                        <div class="score" id="scoreNum">0</div>
+                        <div class="of">out of 100</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="result-summary">
+                    <span class="band" id="bandChip">—</span>
+                    <h2 id="bandTitle"></h2>
+                    <p id="bandText"></p>
+                  </div>
+                </div>
+
+                <div class="breakdown" id="breakdown"></div>
+
+                <div class="hf-overline" style="margin-top:var(--space-8)">Where to focus next</div>
+                <div class="pointers" id="pointers" style="margin-top:var(--space-3)"></div>
+
+                <details class="mock-row">
+                  <summary>Mock: what was saved to the sheet</summary>
+                  <div class="payload" id="assessmentPayload"></div>
+                </details>
+              </div>
+              <div class="panel-foot">
+                <button class="hf-btn ghost" id="retake">Retake assessment</button>
+                <a class="hf-btn primary" href="#/lead">Talk to an expert<svg>
+                    <use href="#i-arrow" />
+                  </svg></a>
+              </div>
+            </div>
+          </div>
+
+          <aside class="tool-aside panel">
+            <div class="panel-body">
+              <div class="hf-overline">What we look at</div>
+              <ul class="aside-list">
+                <li><svg>
+                    <use href="#i-check" />
+                  </svg>Channel presence and profile completeness</li>
+                <li><svg>
+                    <use href="#i-check" />
+                  </svg>Posting cadence and content mix</li>
+                <li><svg>
+                    <use href="#i-check" />
+                  </svg>Engagement and community response</li>
+                <li><svg>
+                    <use href="#i-check" />
+                  </svg>Measurement and patient conversion</li>
+              </ul>
+              <div class="callout"><svg>
+                  <use href="#i-alert" />
+                </svg><span>Demo questions and weights. Final content follows the demo review.</span></div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================= LEAD  (/lead) ======================= -->
+    <section class="view" data-view="/lead">
+      <div class="gtm-container">
+        <div class="page-head">
+          <a href="#/" class="back"><svg>
+              <use href="#i-arrowLeft" />
+            </svg>All tools</a>
+          <h1>Talk to our team</h1>
+          <p>A few quick questions so the right specialist reaches out, ready with ideas for your organization.</p>
+        </div>
+
+        <div class="tool-layout">
+          <div>
+            <div class="stepper" id="leadStepper">
+              <div class="step"><span>1. Your organization</span>
+                <div class="bar"><i></i></div>
+              </div>
+              <div class="step"><span>2. Your needs</span>
+                <div class="bar"><i></i></div>
+              </div>
+              <div class="step"><span>3. Your details</span>
+                <div class="bar"><i></i></div>
+              </div>
+            </div>
+            <div class="panel" id="leadPanel">
+              <form id="leadForm" novalidate>
+                <div class="panel-body">
+                  <div data-lstep="0" id="leadQ0"></div>
+                  <div data-lstep="1" id="leadQ1" class="hidden"></div>
+                  <div data-lstep="2" class="hidden">
+                    <div data-personal-details="lead"></div>
+                    <div class="fields" style="margin-top:var(--space-6)">
+                      <div class="f">
+                        <label for="lead-message">Anything else we should know? <span
+                            style="color:hsl(var(--muted-foreground));font-weight:400">(optional)</span></label>
+                        <textarea class="textarea" id="lead-message" name="message"
+                          placeholder="Goals, current tools, upcoming launches…"></textarea>
+                      </div>
+                      <label class="checkline"><input type="checkbox" id="lead-consent" />I agree to HealthFoundry
+                        contacting me about this request. We never share your details.</label>
+                    </div>
+                    <div class="callout error hidden" id="leadError" style="margin-top:var(--space-5)"><svg>
+                        <use href="#i-alert" />
+                      </svg><span>Something went wrong sending your request. Please try again.</span></div>
+                  </div>
+                </div>
+                <div class="panel-foot">
+                  <button class="hf-btn ghost" type="button" id="leadBack"><svg>
+                      <use href="#i-arrowLeft" />
+                    </svg>Back</button>
+                  <button class="hf-btn primary" type="submit" id="leadSubmit">Continue<svg>
+                      <use href="#i-arrow" />
+                    </svg></button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="panel hidden" id="leadSuccess">
+            <div class="success">
+              <div class="badge"><svg>
+                  <use href="#i-check" />
+                </svg></div>
+              <h2>Thanks — we've got it</h2>
+              <p id="leadSuccessText">A HealthFoundry specialist will reach out within one business day.</p>
+              <div class="actions">
+                <a class="hf-btn outline" href="#/">Back to tools</a>
+                <a class="hf-btn primary" href="#/social-score">Check your social score<svg>
+                    <use href="#i-arrow" />
+                  </svg></a>
+              </div>
+              <div class="payload" id="leadPayload"></div>
+            </div>
+          </div>
+
+          <aside class="tool-aside panel">
+            <div class="panel-body">
+              <div class="hf-overline">What happens next</div>
+              <ul class="aside-list">
+                <li><svg>
+                    <use href="#i-check" />
+                  </svg>We review your request the same day</li>
+                <li><svg>
+                    <use href="#i-check" />
+                  </svg>A specialist emails you to set up a 20-minute call</li>
+                <li><svg>
+                    <use href="#i-check" />
+                  </svg>You get a tailored walkthrough — no generic demo</li>
+              </ul>
+              <div id="leadScoreCard" class="hidden">
+                <div class="hf-overline" style="margin-bottom:var(--space-2)">Attached to your request</div>
+                <div class="mini-score"><span class="hf-num" id="miniScore">—</span>
+                  <div>
+                    <div style="font-size:var(--fs-xs);font-weight:500">Social media score</div><span class="band"
+                      id="miniBand" style="margin-top:4px;height:22px">—</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="gtm-footer">
+    <div class="gtm-container">
+      <span>© 2026 HealthFoundry.ai</span>
+      <span>Mock — Astro + React islands · Cloudflare Pages · Google Sheets · <a href="docs/gtm-plan.md">Build plan
+          (v4)</a></span>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- PersonalDetails template (→ components/PersonalDetails.tsx) -->
+  <template id="tpl-personal">
+    <div class="hf-overline sec">Your details</div>
+    <div class="known-wrap hidden">
+      <div class="known">
+        <div class="avatar"></div>
+        <div class="known-text">
+          <div class="known-name"></div>
+          <div class="known-sub"></div>
+        </div>
+        <button type="button" class="hf-btn outline sm known-edit"><svg>
+            <use href="#i-pencil" />
+          </svg>Edit</button>
+      </div>
+      <div class="known-note"><svg>
+          <use href="#i-checkCircle" />
+        </svg><span></span></div>
+    </div>
+    <div class="fields">
+      <div class="row2">
+        <div class="f">
+          <label>Full name<span class="req">*</span></label>
+          <input class="input" name="name" autocomplete="name" placeholder="Jordan Lee" required />
+          <div class="hint"></div>
+        </div>
+        <div class="f">
+          <label>Organization<span class="req">*</span></label>
+          <input class="input" name="company" autocomplete="organization" placeholder="Riverside Health" required />
+          <div class="hint"></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="f" data-email>
+          <label>Work email<span class="req">*</span></label>
+          <input class="input" name="email" type="email" autocomplete="email" placeholder="you@yourhospital.org"
+            required />
+          <div class="hint">Use your organization email — personal addresses aren't accepted.</div>
+        </div>
+        <div class="f">
+          <label>Job title</label>
+          <input class="input" name="title" autocomplete="organization-title" placeholder="Marketing director" />
+          <div class="hint"></div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    /* ============================================================
+       lib/validateEmail.ts  (shared client + server)
+       ============================================================ */
+    const FREE_DOMAINS = new Set([
+      "gmail.com", "googlemail.com", "yahoo.com", "outlook.com", "hotmail.com",
+      "live.com", "icloud.com", "aol.com", "proton.me", "protonmail.com",
+      "gmx.com", "mail.com", "yandex.com", "zoho.com"
+    ]);
+    const EMAIL_RE = /^[^\s@]+@([^\s@]+\.[^\s@]+)$/;
+    function validateOrgEmail(email) {
+      const m = email.trim().toLowerCase().match(EMAIL_RE);
+      if (!m) return { ok: false, reason: "Enter a valid email address." };
+      if (FREE_DOMAINS.has(m[1])) return { ok: false, reason: "Please use your organization email, not a personal one." };
+      return { ok: true };
+    }
+
+    /* ============================================================
+       lib/scoring.ts  (demo questions + weights)
+       ============================================================ */
+    const QUESTIONS = [
+      {
+        cat: "Presence", q: "How many social channels does your organization actively maintain?",
+        opts: [["None or just one", 0], ["Two", 1], ["Three to four", 2], ["Five or more, each with a clear purpose", 3]]
+      },
+      {
+        cat: "Cadence", q: "How often do you publish new content?",
+        opts: [["Rarely / ad hoc", 0], ["A few times a month", 1], ["Weekly", 2], ["Several times a week, on a content calendar", 3]]
+      },
+      {
+        cat: "Content", q: "What best describes your content mix?",
+        opts: [["Mostly announcements", 0], ["Announcements plus some health tips", 1], ["Educational content, stories and events", 2], ["Planned mix incl. video, patient stories and clinician voices", 3]]
+      },
+      {
+        cat: "Engagement", q: "How quickly do you respond to comments and messages?",
+        opts: [["We usually don't", 0], ["Within a week", 1], ["Within 1–2 days", 2], ["Same day, with a defined escalation path", 3]]
+      },
+      {
+        cat: "Measurement", q: "How do you measure social media performance?",
+        opts: [["We don't track it", 0], ["Follower counts", 1], ["Engagement and reach reports", 2], ["Tied to appointments, referrals or web conversions", 3]]
+      },
+      {
+        cat: "Governance", q: "Do you have a documented social media policy and approval workflow?",
+        opts: [["No", 0], ["Informal guidelines", 1], ["Written policy", 2], ["Written policy, approvals and compliance review", 3]]
+      },
+    ];
+    const BANDS = [
+      {
+        min: 0, key: "low", label: "Low", title: "Plenty of room to grow",
+        text: "Your social presence is early-stage. A few foundational habits will move your score quickly."
+      },
+      {
+        min: 40, key: "growing", label: "Growing", title: "Solid foundations, building momentum",
+        text: "You have the basics in place. Consistency and measurement are the next unlocks."
+      },
+      {
+        min: 70, key: "strong", label: "Strong", title: "Ahead of most healthcare peers",
+        text: "Your social program is mature. Focus on tying activity to patient outcomes and growth."
+      },
+    ];
+    const POINTERS = {
+      Presence: ["Consolidate your channels", "Pick the 2–3 platforms your patients actually use and complete every profile."],
+      Cadence: ["Set a content calendar", "A predictable weekly rhythm beats bursts of activity."],
+      Content: ["Add human stories", "Clinician and patient stories outperform announcements on every platform."],
+      Engagement: ["Define a response SLA", "Aim for same-day replies and a clear escalation path for clinical questions."],
+      Measurement: ["Connect social to outcomes", "Track appointment requests and referrals sourced from social, not just likes."],
+      Governance: ["Write down the rules", "A short policy and approval flow keeps you fast and compliant."],
+    };
+    function computeScore(answers) {
+      const max = QUESTIONS.length * 3;
+      const total = answers.reduce((s, a) => s + a, 0);
+      const score = Math.round((total / max) * 100);
+      const band = [...BANDS].reverse().find(b => score >= b.min);
+      const byCat = QUESTIONS.map((q, i) => ({ cat: q.cat, pct: Math.round((answers[i] / 3) * 100) }));
+      const pointers = [...byCat].sort((a, b) => a.pct - b.pct).slice(0, 3).map(c => POINTERS[c.cat]);
+      return { score, band, byCat, pointers };
+    }
+
+    /* ============================================================
+       UI helpers
+       ============================================================ */
+    const $ = (s, r = document) => r.querySelector(s);
+    const toastEl = $("#toast");
+    let toastT;
+    function toast(msg) {
+      toastEl.textContent = msg; toastEl.classList.add("show");
+      clearTimeout(toastT); toastT = setTimeout(() => toastEl.classList.remove("show"), 2600);
+    }
+    function setFieldState(f, state, msg) {
+      f.classList.toggle("invalid", state === "invalid");
+      f.classList.toggle("valid", state === "valid");
+      const hint = $(".hint", f);
+      if (msg !== undefined) {
+        const icon = state === "invalid" ? "i-alert" : state === "valid" ? "i-checkCircle" : null;
+        hint.innerHTML = (icon ? `<svg><use href="#${icon}"/></svg>` : "") + `<span>${msg}</span>`;
+      }
+    }
+
+    /* ============================================================
+       lib/visitorStore.ts — details entered once are reused across
+       tools (sessionStorage; see docs/gtm-plan.md §6.1)
+       ============================================================ */
+    const DETAIL_KEYS = ["name", "company", "email", "title"];
+    const SOURCE_LABEL = { score: "your social score assessment", lead: "your contact request" };
+    const store = {
+      get(k) { try { return JSON.parse(sessionStorage.getItem("hf-" + k)); } catch { return null; } },
+      set(k, v) { try { sessionStorage.setItem("hf-" + k, JSON.stringify(v)); } catch { } store[`_${k}`] = v; },
+    };
+    const getDetails = () => store.get("details") ?? store._details ?? null;
+    const getLastScore = () => store.get("score") ?? store._score ?? null;
+    function saveDetails(form, source) {
+      const d = {}; DETAIL_KEYS.forEach(k => d[k] = (form.querySelector(`[data-personal-details] [name=${k}]`)?.value ?? "").trim());
+      store.set("details", { ...d, source });
+      document.querySelectorAll("[data-personal-details]").forEach(h => { h.dataset.editing = ""; });
+    }
+    const initials = n => n.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join("") || "?";
+
+    /* PersonalDetails "component" — mount into each form */
+    function setEditing(host, editing) {
+      host.dataset.editing = editing ? "1" : "";
+      $(".known-wrap", host).classList.toggle("hidden", editing);
+      $(".fields", host).classList.toggle("hidden", !editing);
+    }
+    function hydratePersonal(host) {
+      const d = getDetails();
+      if (!d || !d.email) { setEditing(host, true); return; }
+      if (host.dataset.editing === "1" && host.dataset.hydrated) return; // user is mid-edit
+      DETAIL_KEYS.forEach(k => { $(`[name=${k}]`, host).value = d[k] || ""; });
+      $(".avatar", host).textContent = initials(d.name);
+      $(".known-name", host).textContent = [d.name, d.title].filter(Boolean).join(" · ");
+      $(".known-sub", host).textContent = `${d.email} · ${d.company}`;
+      $(".known-note span", host).textContent = `Pre-filled from ${SOURCE_LABEL[d.source] ?? "earlier"}. Edit if anything has changed.`;
+      const ef = $("[data-email]", host);
+      setFieldState(ef, "valid", "Organization email verified");
+      host.dataset.hydrated = "1";
+      setEditing(host, false);
+    }
+    document.querySelectorAll("[data-personal-details]").forEach(host => {
+      const id = host.dataset.personalDetails;
+      host.appendChild($("#tpl-personal").content.cloneNode(true));
+      host.querySelectorAll(".f").forEach(f => {
+        const input = $("input", f), label = $("label", f);
+        input.id = `${id}-${input.name}`; label.htmlFor = input.id;
+      });
+      $(".known-edit", host).onclick = () => { setEditing(host, true); $("[name=name]", host).focus(); };
+      const ef = $("[data-email]", host), ei = $("input", ef);
+      const defaultHint = $(".hint", ef).innerHTML;
+      let touched = false;
+      const check = () => {
+        if (!ei.value.trim()) { setFieldState(ef, null); $(".hint", ef).innerHTML = defaultHint; return; }
+        const r = validateOrgEmail(ei.value);
+        setFieldState(ef, r.ok ? "valid" : "invalid", r.ok ? "Organization email verified" : r.reason);
+      };
+      ei.addEventListener("blur", () => { touched = true; check(); });
+      ei.addEventListener("input", () => { if (touched) check(); });
+      hydratePersonal(host);
+    });
+
+    function validatePersonal(form) {
+      let ok = true, firstBad = null;
+      const host = form.querySelector("[data-personal-details]");
+      form.querySelectorAll("[data-personal-details] .f").forEach(f => {
+        const input = $("input", f);
+        if (!input.required) return;
+        if (input.name === "email") {
+          const r = validateOrgEmail(input.value);
+          setFieldState(f, r.ok ? "valid" : "invalid", r.ok ? "Organization email verified" : r.reason);
+          if (!r.ok) { ok = false; firstBad ??= input; }
+        } else if (!input.value.trim()) {
+          setFieldState(f, "invalid", "Required"); ok = false; firstBad ??= input;
+        } else setFieldState(f, null, "");
+      });
+      if (firstBad) { setEditing(host, true); firstBad.focus(); }
+      return ok;
+    }
+    function setStepper(el, n) {
+      el.querySelectorAll(".step").forEach((s, i) => { s.classList.toggle("done", i < n); s.classList.toggle("current", i === n); });
+    }
+    const formData = form => Object.fromEntries(new FormData(form).entries());
+
+    /* ============================================================
+       Mock of POST /api/assessment (pages/api/assessment.ts) → "Assessments" tab
+       Re-validates details, checks raw answers, RECOMPUTES the score.
+       ============================================================ */
+    async function mockPostAssessment(d) {
+      await new Promise(r => setTimeout(r, 700));
+      const check = validateOrgEmail(d.email ?? "");
+      if (!check.ok) return { status: 400, body: check };
+      if (!d.name?.trim() || !d.company?.trim()) return { status: 400, body: { ok: false, reason: "Missing details." } };
+      const a = d.answers;
+      if (!Array.isArray(a) || a.length !== QUESTIONS.length || !a.every(x => Number.isInteger(x) && x >= 0 && x <= 3))
+        return { status: 400, body: { ok: false, reason: "Invalid answers." } };
+      const { score, band, byCat } = computeScore(a);   // never trust a client-sent score
+      const cats = Object.fromEntries(byCat.map(c => [c.cat.toLowerCase(), c.pct]));
+      const row = {
+        kind: "assessment", name: d.name, email: d.email, company: d.company, title: d.title ?? "",
+        score, band: band.label, ...cats, answers: a.join(","),
+      };
+      return { status: 200, body: { ok: true }, row };
+    }
+
+    /* ============================================================
+       Mock of POST /api/lead (pages/api/lead.ts) → Apps Script → Google Sheet
+       Runs "server-side": re-validates email + answers, computes fit.
+       ============================================================ */
+    async function mockPostLead(d) {
+      await new Promise(r => setTimeout(r, 900));
+      const check = validateOrgEmail(d.email ?? "");
+      if (!check.ok) return { status: 400, body: check };
+      if (!d.name?.trim() || !d.company?.trim()) return { status: 400, body: { ok: false, reason: "Missing details." } };
+      for (const q of LEAD_STEPS.flat()) {
+        const v = d[q.id];
+        const vals = q.type === "multi" ? (Array.isArray(v) ? v : []) : [v];
+        if (!vals.length || !vals.every(x => q.opts.includes(x)))
+          return { status: 400, body: { ok: false, reason: `Invalid answer: ${q.id}` } };
+      }
+      const row = { ...d, priorities: d.priorities.join(", "), fit: leadFit(d) }; // fit: server-only
+      return { status: 200, body: { ok: true }, row };
+    }
+
+    /* ============================================================
+       Social score flow
+       ============================================================ */
+    const answers = new Array(QUESTIONS.length).fill(null);
+    let qi = 0;
+    function setStep(n) {
+      setStepper($("#scoreStepper"), n);
+      if (n === 1) hydratePersonal($("#gateForm [data-personal-details]"));
+      $("#qPanel").classList.toggle("hidden", n !== 0);
+      $("#gatePanel").classList.toggle("hidden", n !== 1);
+      $("#resultPanel").classList.toggle("hidden", n !== 2);
+    }
+    function renderQ() {
+      const q = QUESTIONS[qi];
+      $("#qCategory").textContent = q.cat;
+      $("#qCount").textContent = `${qi + 1} / ${QUESTIONS.length}`;
+      $("#qTitle").textContent = q.q;
+      const wrap = $("#qOptions"); wrap.innerHTML = "";
+      q.opts.forEach(([label, w]) => {
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "option" + (answers[qi] === w ? " selected" : "");
+        b.setAttribute("role", "radio"); b.setAttribute("aria-checked", answers[qi] === w);
+        b.innerHTML = `<span class="radio"></span><span>${label}</span>`;
+        b.onclick = () => { answers[qi] = w; renderQ(); };
+        wrap.appendChild(b);
+      });
+      $("#qBack").style.visibility = qi === 0 ? "hidden" : "visible";
+      $("#qNext").disabled = answers[qi] === null;
+      $("#qNext").firstChild.textContent = qi === QUESTIONS.length - 1 ? "See my score" : "Next";
+    }
+    $("#qNext").onclick = () => { if (qi < QUESTIONS.length - 1) { qi++; renderQ(); } else setStep(1); };
+    $("#qBack").onclick = () => { if (qi > 0) { qi--; renderQ(); } };
+    $("#gateBack").onclick = () => setStep(0);
+
+    $("#gateForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      if (!validatePersonal(e.target)) return;
+      const btn = $("#gateSubmit"), err = $("#gateError");
+      err.classList.add("hidden");
+      btn.classList.add("loading"); btn.innerHTML = `<span class="spinner"></span>Calculating…`;
+
+      // POST /api/assessment — details + RAW answers; server recomputes the score
+      let res;
+      try { res = await mockPostAssessment({ ...formData(e.target), answers: [...answers] }); }
+      catch { res = { status: 502, body: { ok: false } }; }
+      btn.classList.remove("loading"); btn.innerHTML = `Reveal my score<svg><use href="#i-arrow"/></svg>`;
+
+      if (res.status === 400) {               // bad email/details → keep the score locked
+        $("span", err).textContent = res.body.reason ?? "Please check your details.";
+        err.classList.remove("hidden");
+        return;
+      }
+      if (res.status !== 200) console.warn("[analytics] assessment save failed — revealing anyway");
+
+      saveDetails(e.target, "score");
+      hydratePersonal(e.target.querySelector("[data-personal-details]"));
+      $("#assessmentPayload").textContent = res.row
+        ? `// mock: /api/assessment → SHEET_WEBHOOK_URL → "Assessments" tab (14 columns, see docs/gtm-plan.md §7.1)\n` +
+        JSON.stringify({ timestamp: new Date().toISOString(), ...res.row }, null, 2)
+        : `// save failed (${res.status}) — score revealed anyway`;
+      showResult(computeScore(answers));
+    });
+
+    function showResult({ score, band, byCat, pointers }) {
+      setStep(2);
+      store.set("score", { score, band: band.key, label: band.label });
+      const chip = $("#bandChip"); chip.className = `band ${band.key}`; chip.textContent = band.label;
+      $("#bandTitle").textContent = band.title;
+      $("#bandText").textContent = band.text;
+      $("#breakdown").innerHTML = byCat.map(c =>
+        `<div class="bd-row"><span>${c.cat}</span><div class="bd-bar"><i style="width:0" data-w="${c.pct}"></i></div><span class="hf-num">${c.pct}%</span></div>`).join("");
+      $("#pointers").innerHTML = pointers.map(([t, d], i) =>
+        `<div class="pointer"><div class="n">${i + 1}</div><h3>${t}</h3><p>${d}</p></div>`).join("");
+      const C = 326.73, ring = $("#ringVal"), num = $("#scoreNum");
+      ring.style.stroke = band.key === "low" ? "hsl(var(--destructive))" : band.key === "growing" ? "hsl(var(--warning))" : "hsl(var(--success))";
+      requestAnimationFrame(() => {
+        ring.style.strokeDashoffset = C * (1 - score / 100);
+        document.querySelectorAll(".bd-bar i").forEach(i => i.style.width = i.dataset.w + "%");
+      });
+      const t0 = performance.now();
+      (function tick(t) {
+        const p = Math.min(1, (t - t0) / 900);
+        num.textContent = Math.round(score * (1 - Math.pow(1 - p, 3)));
+        if (p < 1) requestAnimationFrame(tick);
+      })(t0);
+      toast("Score unlocked — summary saved");
+    }
+    $("#retake").onclick = () => { answers.fill(null); qi = 0; renderQ(); setStep(0); };
+
+    /* ============================================================
+       Lead flow
+       ============================================================ */
+    /* ============================================================
+       lib/leadQuestions.ts  (demo content, client + server)
+       ============================================================ */
+    const LEAD_STEPS = [
+      [
+        {
+          id: "orgType", label: "What type of organization are you?", type: "radio", cols2: true,
+          opts: ["Hospital / health system", "Multi-specialty clinic", "Diagnostics / lab network", "Payer, pharma or other"]
+        },
+        {
+          id: "facilities", label: "How many facilities or locations do you operate?", type: "pills",
+          opts: ["1", "2–5", "6–20", "20+"]
+        },
+        {
+          id: "role", label: "Which best describes your role?", type: "pills",
+          opts: ["Leadership / C-suite", "Marketing", "Operations", "IT / digital", "Clinical"]
+        },
+      ],
+      [
+        {
+          id: "priorities", label: "What are you looking to improve?", hint: "Select all that apply", type: "multi", cols2: true,
+          opts: ["Patient acquisition", "Referral growth", "Brand & social media", "Operational analytics", "Patient experience", "Something else"]
+        },
+        {
+          id: "challenge", label: "What's the biggest blocker today?", type: "radio",
+          opts: ["We don't know which channels bring patients", "Not enough time or people to execute", "Data is scattered across systems", "Hard to prove ROI to leadership"]
+        },
+        {
+          id: "timeline", label: "When are you looking to get started?", type: "pills",
+          opts: ["Just exploring", "Next 6 months", "This quarter", "Budget approved"]
+        },
+      ],
+    ];
+    const leadAns = {};
+    let lstep = 0, leadDone = false;
+
+    function renderLeadStep(i) {
+      const wrap = $(`#leadQ${i}`);
+      wrap.innerHTML = LEAD_STEPS[i].map(q => `
+    <div class="qblock" data-q="${q.id}">
+      <div class="qlabel">${q.label}${q.hint ? ` <span class="opt">— ${q.hint}</span>` : ""}</div>
+      ${q.type === "pills"
+          ? `<div class="pills">${q.opts.map(o => `<button type="button" class="pill" data-v="${o}">${o}</button>`).join("")}</div>`
+          : `<div class="options${q.cols2 ? " cols2" : ""}">${q.opts.map(o =>
+            `<button type="button" class="option" data-v="${o}">${q.type === "multi"
+              ? `<span class="box"><svg><use href="#i-check"/></svg></span>` : `<span class="radio"></span>`}<span>${o}</span></button>`).join("")}</div>`}
+    </div>`).join("");
+      LEAD_STEPS[i].forEach(q => {
+        const block = $(`[data-q="${q.id}"]`, wrap);
+        const paint = () => block.querySelectorAll("[data-v]").forEach(b => {
+          const sel = q.type === "multi" ? (leadAns[q.id] ?? []).includes(b.dataset.v) : leadAns[q.id] === b.dataset.v;
+          b.classList.toggle("selected", sel); b.setAttribute("aria-pressed", sel);
+        });
+        block.querySelectorAll("[data-v]").forEach(b => b.onclick = () => {
+          const v = b.dataset.v;
+          if (q.type === "multi") {
+            const s = new Set(leadAns[q.id] ?? []); s.has(v) ? s.delete(v) : s.add(v); leadAns[q.id] = [...s];
+          } else leadAns[q.id] = v;
+          $(".qerr", block)?.remove(); paint();
+        });
+        paint();
+      });
+    }
+    function validateLeadStep(i) {
+      let ok = true, first = null;
+      LEAD_STEPS[i].forEach(q => {
+        const block = $(`[data-q="${q.id}"]`); $(".qerr", block)?.remove();
+        const a = leadAns[q.id];
+        if (!a || (Array.isArray(a) && !a.length)) {
+          ok = false; first ??= block;
+          block.insertAdjacentHTML("beforeend", `<div class="qerr"><svg><use href="#i-alert"/></svg>Please choose an option</div>`);
+        }
+      });
+      first?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return ok;
+    }
+    function showLeadStep(n) {
+      lstep = n;
+      setStepper($("#leadStepper"), n);
+      document.querySelectorAll("[data-lstep]").forEach(s => s.classList.toggle("hidden", +s.dataset.lstep !== n));
+      $("#leadBack").style.visibility = n === 0 ? "hidden" : "visible";
+      $("#leadSubmit").innerHTML = n === 2 ? `Send request<svg><use href="#i-arrow"/></svg>` : `Continue<svg><use href="#i-arrow"/></svg>`;
+      if (n === 2) hydratePersonal($("#leadForm [data-personal-details]"));
+    }
+    /* lib/leadFit.ts — imported by /api/lead only; called from mockPostLead */
+    function leadFit(a) {
+      const t = { "Just exploring": 0, "Next 6 months": 1, "This quarter": 2, "Budget approved": 3 }[a.timeline] ?? 0;
+      const f = { "1": 0, "2–5": 1, "6–20": 2, "20+": 3 }[a.facilities] ?? 0;
+      const r = a.role === "Leadership / C-suite" ? 2 : 1;
+      const s = t * 2 + f + r;
+      return s >= 8 ? "hot" : s >= 4 ? "warm" : "nurture";
+    }
+    $("#leadBack").onclick = () => showLeadStep(Math.max(0, lstep - 1));
+
+    $("#leadForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      const form = e.target;
+      if (lstep < 2) { if (validateLeadStep(lstep)) { showLeadStep(lstep + 1); window.scrollTo({ top: 0, behavior: "smooth" }); } return; }
+
+      let ok = validatePersonal(form);
+      if (ok && !$("#lead-consent").checked) { toast("Please agree to be contacted"); ok = false; }
+      if (!ok) return;
+
+      const btn = $("#leadSubmit");
+      btn.classList.add("loading"); btn.innerHTML = `<span class="spinner"></span>Sending…`;
+      $("#leadError").classList.add("hidden");
+      const details = formData(form);
+      const score = getLastScore();
+      const data = {
+        ...details,
+        ...leadAns,
+        socialScore: score ? `${score.score} (${score.label})` : "",
+      };
+      const res = await mockPostLead(data);
+      btn.classList.remove("loading"); btn.innerHTML = `Send request<svg><use href="#i-arrow"/></svg>`;
+      if (res.status !== 200) { $("#leadError").classList.remove("hidden"); return; }
+
+      saveDetails(form, "lead");
+      leadDone = true;
+      $("#leadPanel").parentElement.classList.add("hidden");
+      $("#leadSuccess").classList.remove("hidden");
+      $("#leadSuccessText").textContent = `Thanks, ${details.name.split(" ")[0]}. A HealthFoundry specialist will email ${details.email} within one business day.`;
+      const r = res.row;
+      const sheetRow = {
+        timestamp: new Date().toISOString(), name: r.name, email: r.email, company: r.company, title: r.title,
+        orgType: r.orgType, facilities: r.facilities, role: r.role,
+        priorities: r.priorities, challenge: r.challenge, timeline: r.timeline,
+        socialScore: r.socialScore, fit: r.fit, message: r.message,
+      };
+      $("#leadPayload").textContent =
+        `// mock: /api/lead → SHEET_WEBHOOK_URL → "Leads" sheet row (14 columns, see docs/gtm-plan.md §7)\n` +
+        `// "fit" is internal — computed server-side, never shown to the visitor\n` +
+        JSON.stringify(sheetRow, null, 2);
+    });
+    renderLeadStep(0); renderLeadStep(1); showLeadStep(0);
+
+    /* ============================================================
+       Router + theme
+       ============================================================ */
+    function route() {
+      const path = location.hash.replace(/^#/, "") || "/";
+      document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.dataset.view === path));
+      if (!document.querySelector(".view.active")) document.querySelector('[data-view="/"]').classList.add("active");
+      document.querySelectorAll(".gtm-nav a").forEach(a => a.classList.toggle("active", a.dataset.route === path));
+      if (path === "/lead") {
+        if (leadDone) {
+          leadDone = false; Object.keys(leadAns).forEach(k => delete leadAns[k]);
+          $("#lead-message").value = ""; $("#lead-consent").checked = false;
+          renderLeadStep(0); renderLeadStep(1); showLeadStep(0);
+        }
+        $("#leadPanel").parentElement.classList.remove("hidden"); $("#leadSuccess").classList.add("hidden");
+        hydratePersonal($("#leadForm [data-personal-details]"));
+        const s = getLastScore();
+        $("#leadScoreCard").classList.toggle("hidden", !s);
+        if (s) { $("#miniScore").textContent = s.score; const b = $("#miniBand"); b.className = `band ${s.band}`; b.textContent = s.label; b.style.height = "22px"; }
+      }
+      if (path === "/social-score") hydratePersonal($("#gateForm [data-personal-details]"));
+      window.scrollTo(0, 0);
+    }
+    window.addEventListener("hashchange", route);
+
+    try { if (localStorage.getItem("hf-theme") === "dark") document.documentElement.classList.add("dark"); } catch { }
+    $("#themeToggle").onclick = () => {
+      const dark = document.documentElement.classList.toggle("dark");
+      try { localStorage.setItem("hf-theme", dark ? "dark" : "light"); } catch { }
+    };
+
+    renderQ(); setStep(0); route();
+  </script>
+</body>
+
+</html>

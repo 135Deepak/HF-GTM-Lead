@@ -1,0 +1,187 @@
+/* ============================================================
+   RESPONSIVE — HealthFoundry GTM
+   Mobile-first additions on top of global.css
+   ============================================================ */
+
+/* ---- Hamburger button (hidden on desktop) ---- */
+.gtm-hamburger {
+  display: none;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-md);
+  background: transparent;
+  cursor: pointer;
+  color: hsl(var(--muted-foreground));
+  flex: none;
+}
+.gtm-hamburger svg { width: 20px; height: 20px; }
+
+/* ---- Container safe padding on small mobile ---- */
+@media (max-width: 480px) {
+  .gtm-header-inner,
+  .gtm-container { padding-left: var(--space-3); padding-right: var(--space-3); }
+}
+
+/* ---- Header & mobile nav ---- */
+@media (max-width: 640px) {
+  .gtm-header-inner { gap: var(--space-2); }
+
+  .gtm-hamburger { display: grid; }
+
+  /* Reorder: logo | theme-toggle | hamburger */
+  .gtm-iconbtn  { order: 1; }
+  .gtm-hamburger { order: 2; }
+
+  .gtm-nav {
+    display: none;
+    position: fixed;
+    inset: 60px 0 0 0;
+    z-index: 20;
+    background: hsl(var(--card));
+    flex-direction: column;
+    gap: 0;
+    margin: 0;
+    border-top: 1px solid hsl(var(--border));
+    padding: var(--space-4);
+    order: 3;
+  }
+  .gtm-nav.open { display: flex; }
+  .gtm-nav a {
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius);
+    font-size: var(--fs-base);
+  }
+}
+
+/* ---- Hero typography ---- */
+@media (max-width: 640px) {
+  .hero { padding: var(--space-8) 0 var(--space-6); }
+  .hero h1 { font-size: clamp(1.5rem, 6vw, 1.875rem); }
+  .hero p  { font-size: var(--fs-sm); }
+}
+
+/* ---- Tool grid: 1 col on mobile ---- */
+@media (max-width: 540px) {
+  .tool-grid { grid-template-columns: 1fr; gap: var(--space-4); }
+}
+
+/* ---- Trust badges: stack ---- */
+@media (max-width: 600px) {
+  .trust {
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    text-align: center;
+  }
+}
+
+/* ---- Platform capabilities strip ---- */
+.platform-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-5);
+  margin-top: var(--space-10);
+  padding: var(--space-6);
+  border-radius: var(--radius-xl);
+  background: hsl(var(--surface-sunken));
+  border: 1px solid hsl(var(--border));
+}
+@media (max-width: 768px) {
+  .platform-strip { grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+}
+@media (max-width: 540px) {
+  .platform-strip { grid-template-columns: 1fr; gap: var(--space-3); padding: var(--space-4); }
+}
+.platform-item { display: flex; flex-direction: column; gap: var(--space-2); }
+.platform-item strong { font-size: var(--fs-sm); font-weight: 600; }
+.platform-item p {
+  font-size: var(--fs-xs);
+  color: hsl(var(--muted-foreground));
+  line-height: 1.55;
+  margin: 0;
+}
+.platform-icon {
+  width: 32px; height: 32px;
+  border-radius: var(--radius);
+  display: grid; place-items: center;
+  font-size: 14px;
+  background: hsl(var(--primary) / 0.1);
+  color: hsl(var(--primary));
+  margin-bottom: var(--space-1);
+}
+
+/* ---- Page head on mobile ---- */
+@media (max-width: 640px) {
+  .page-head { padding: var(--space-6) 0 var(--space-4); }
+  .page-head h1 { font-size: var(--fs-xl); }
+  .page-head p { font-size: var(--fs-sm); }
+}
+
+/* ---- Tool layout: aside below on tablet/mobile ---- */
+@media (max-width: 860px) {
+  .tool-layout { grid-template-columns: 1fr; }
+  .tool-aside { order: -1; }
+}
+
+/* ---- Panel body / foot on mobile ---- */
+@media (max-width: 480px) {
+  .panel-body { padding: var(--space-4); }
+  .panel-foot { padding: var(--space-3) var(--space-4); flex-wrap: wrap; gap: var(--space-2); }
+}
+
+/* ---- Score ring: smaller on mobile ---- */
+@media (max-width: 480px) {
+  .ring { width: 120px; height: 120px; }
+  .ring .score { font-size: 2rem; }
+  .result-top { gap: var(--space-5); flex-direction: column; align-items: center; }
+}
+
+/* ---- Pointers: 1 col on mobile ---- */
+@media (max-width: 480px) {
+  .pointers { grid-template-columns: 1fr; }
+}
+
+/* ---- Buttons: full width on small mobile ---- */
+@media (max-width: 360px) {
+  .hf-btn { width: 100%; justify-content: center; }
+  .panel-foot { flex-direction: column; }
+  .success .actions { flex-direction: column; align-items: stretch; }
+}
+
+/* ---- Input / form fields ---- */
+@media (max-width: 480px) {
+  .hf-input, .hf-select { font-size: var(--fs-sm); }
+  .row2 { grid-template-columns: 1fr; }
+}
+
+/* ---- Footer responsive ---- */
+@media (max-width: 540px) {
+  .gtm-footer .gtm-container {
+    flex-direction: column;
+    gap: var(--space-2);
+    text-align: center;
+  }
+}
+
+/* ---- Lead questionnaire cols on mobile ---- */
+@media (max-width: 480px) {
+  .options.cols2 { grid-template-columns: 1fr; }
+  .bd-row { flex-direction: column; gap: var(--space-3); }
+}
+
+/* ---- No horizontal scroll on any breakpoint ---- */
+html, body { overflow-x: hidden; }
+.gtm-container { box-sizing: border-box; width: 100%; }
+
+/* ---- Tablet (768px): typography & spacing tune ---- */
+@media (max-width: 768px) {
+  .hero h1 { font-size: clamp(1.6rem, 5vw, 2.25rem); }
+  .tool-card { padding: var(--space-5); }
+}
+
+/* ---- Laptop (1024px): ensure nav doesn't overflow ---- */
+@media (max-width: 1024px) {
+  .gtm-nav a { font-size: var(--fs-sm); }
+}

@@ -1,0 +1,56 @@
+---
+import "../styles/global.css";
+import "../styles/responsive.css";
+import IconSprite from "../components/IconSprite.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "HealthFoundry — GTM tools (mock)",
+  description = "Two quick tools for healthcare organizations — benchmark your social media presence in a few minutes, or tell us what you're working on and we'll get back to you."
+} = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href="/assets/logo-mark.jpg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
+    <script is:inline>
+      try {
+        if (localStorage.getItem("hf-theme") === "dark") {
+          document.documentElement.classList.add("dark");
+        }
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <IconSprite />
+    <Header />
+    <main>
+      <slot />
+    </main>
+    <Footer />
+
+    <script>
+      const toggle = document.getElementById("themeToggle");
+      if (toggle) {
+        toggle.addEventListener("click", () => {
+          const dark = document.documentElement.classList.toggle("dark");
+          try {
+            localStorage.setItem("hf-theme", dark ? "dark" : "light");
+          } catch {}
+        });
+      }
+    </script>
+  </body>
+</html>

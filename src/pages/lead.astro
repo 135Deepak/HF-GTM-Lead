@@ -1,0 +1,18 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import { LeadForm } from "../components/LeadForm";
+---
+
+<MainLayout title="Consult with Healthcare Specialists — HealthFoundry">
+  <section class="view active" data-view="/lead">
+    <div class="gtm-container">
+      <div class="page-head">
+        <a href="/" class="back"><svg><use href="#i-arrowLeft"/></svg>All tools</a>
+        <h1>Consult with Our Healthcare GTM Team</h1>
+        <p>Tell us what you're trying to solve. Our specialists will map your needs to Vital360, VitalStatistix, or VitalRails — and get back to you within one business day.</p>
+      </div>
+
+      <LeadForm client:load />
+    </div>
+  </section>
+</MainLayout>

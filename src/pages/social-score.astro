@@ -1,0 +1,33 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import { SocialScoreAssessment } from "../components/SocialScoreAssessment";
+---
+
+<MainLayout title="Healthcare Social Media Index — HealthFoundry">
+  <section class="view active" data-view="/social-score">
+    <div class="gtm-container">
+      <div class="page-head">
+        <a href="/" class="back"><svg><use href="#i-arrowLeft"/></svg>All tools</a>
+        <h1>Healthcare Social Media Index</h1>
+        <p>A 3-minute diagnostic for healthcare marketing and clinical leaders. Your benchmark is calculated instantly in your browser.</p>
+      </div>
+
+      <div class="tool-layout">
+        <SocialScoreAssessment client:load />
+
+        <aside class="tool-aside panel">
+          <div class="panel-body">
+            <div class="hf-overline">What we evaluate</div>
+            <ul class="aside-list">
+              <li><svg><use href="#i-check"/></svg>Channel footprint and profile completeness</li>
+              <li><svg><use href="#i-check"/></svg>Clinical publishing cadence and content mix</li>
+              <li><svg><use href="#i-check"/></svg>Patient engagement and community responsiveness</li>
+              <li><svg><use href="#i-check"/></svg>Appointment conversion and referral attribution</li>
+            </ul>
+            <div class="callout"><svg><use href="#i-alert"/></svg><span>Part of HealthFoundry's Vital360 patient growth diagnostic suite. Scores calibrated to healthcare peer benchmarks.</span></div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+</MainLayout>
