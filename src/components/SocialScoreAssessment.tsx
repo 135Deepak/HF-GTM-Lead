@@ -108,15 +108,6 @@ export const SocialScoreAssessment: React.FC = () => {
     const completeAnswers = answers.map(a => a ?? 0);
     const result = computeScore(completeAnswers);
 
-    const savedDetails: VisitorDetails = { ...details, source: "score" };
-    saveDetails(savedDetails);
-    saveLastScore({
-      score: result.score,
-      band: result.band.key,
-      label: result.band.label
-    });
-
-    let recordedToSheet = false;
     let savedRowData: any = null;
 
     try {
@@ -128,37 +119,35 @@ export const SocialScoreAssessment: React.FC = () => {
           answers: completeAnswers
         })
       });
-      const data = await res.json();
-      if (res.ok && data.ok) {
-        recordedToSheet = Boolean(data.recordedToSheet);
-        savedRowData = data.row;
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data?.ok) {
+        setGateError(data?.reason || "Failed to record assessment to Google Sheets. Please try again.");
+        setCalculating(false);
+        return;
       }
-    } catch (err) {
-      console.warn("Local assessment fallback:", err);
+      savedRowData = data.row;
+      setPayloadJson(
+        `// Confirmed saved to Google Sheet (${data.row?.sheet || "Assessments"} tab, row #${data.row?.rowNumber || ""}):\n` +
+          JSON.stringify(data.row, null, 2)
+      );
+    } catch {
+      setGateError("Unable to reach the server to save your assessment to Google Sheets. Please check your connection and try again.");
+      setCalculating(false);
+      return;
     }
 
-    const sheetRow = savedRowData || {
-      timestamp: new Date().toISOString(),
-      kind: "assessment",
-      name: details.name,
-      email: details.email,
-      company: details.company,
-      title: details.title || "",
+    const savedDetails: VisitorDetails = { ...details, source: "score" };
+    saveDetails(savedDetails);
+    saveLastScore({
       score: result.score,
-      band: result.band.label,
-      ...Object.fromEntries(result.byCat.map(c => [c.cat.toLowerCase(), c.pct])),
-      answers: completeAnswers.join(",")
-    };
-
-    setPayloadJson(
-      `// Record destination: ${recordedToSheet ? "Google Sheet via Apps Script Webhook" : "Local session ledger"}\n` +
-        JSON.stringify(sheetRow, null, 2)
-    );
+      band: result.band.key,
+      label: result.band.label
+    });
 
     setScoreResult(result);
     setCalculating(false);
     setStep(2);
-    showToast("Response recorded & benchmark unlocked");
+    showToast("Response recorded to Google Sheet & benchmark unlocked");
 
     // Animate score counter and circle
     const C = 326.73;

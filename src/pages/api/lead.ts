@@ -84,38 +84,70 @@ export const POST: APIRoute = async ({ request }) => {
       company: company.trim(),
       title: typeof title === "string" ? title.trim() : "",
       orgType,
-      facilities,
-      role,
-      priorities: Array.isArray(priorities) ? priorities.join(", ") : priorities,
-      challenge,
+      facilities: typeof facilities === "string" ? facilities : "",
+      role: typeof role === "string" ? role : "",
+      priorities: Array.isArray(priorities) ? priorities.join(", ") : (typeof priorities === "string" ? priorities : ""),
+      challenge: typeof challenge === "string" ? challenge : "",
       timeline,
       socialScore: typeof socialScore === "string" ? socialScore : "",
       fit,
       message: typeof message === "string" ? message.trim() : ""
     };
 
-    // Forward to Google Apps Script Webhook if configured
+    // Forward to Google Apps Script Webhook (compulsory)
     const webhookUrl =
+      (import.meta.env && (import.meta.env.GOOGLE_SHEETS_WEBHOOK_URL as string)) ||
       (typeof process !== "undefined" && process.env?.GOOGLE_SHEETS_WEBHOOK_URL) ||
       (typeof process !== "undefined" && process.env?.SHEET_WEBHOOK_URL) ||
       "";
 
-    let webhookSuccess = false;
-    if (webhookUrl) {
-      try {
-        const gasRes = await fetch(webhookUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(lead)
-        });
-        webhookSuccess = gasRes.ok;
-      } catch (err) {
-        console.warn("[Google Apps Script] Webhook delivery notice:", err);
+    if (!webhookUrl) {
+      return new Response(
+        JSON.stringify({
+          ok: false,
+          reason: "Google Sheets integration is not configured. The GOOGLE_SHEETS_WEBHOOK_URL environment variable is required to record leads."
+        }),
+        { status: 503, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    let gasData: any = null;
+    try {
+      const gasRes = await fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(lead),
+        redirect: "follow"
+      });
+      gasData = await gasRes.json().catch(() => null);
+
+      if (!gasRes.ok || !gasData || gasData.result !== "success") {
+        const errorMsg = gasData?.error || "Google Sheets failed to confirm the saved lead.";
+        return new Response(
+          JSON.stringify({ ok: false, reason: errorMsg }),
+          { status: 502, headers: { "Content-Type": "application/json" } }
+        );
       }
+    } catch (err: any) {
+      return new Response(
+        JSON.stringify({
+          ok: false,
+          reason: "Unable to connect to Google Sheets webhook: " + (err?.message || "network error")
+        }),
+        { status: 502, headers: { "Content-Type": "application/json" } }
+      );
     }
 
     return new Response(
-      JSON.stringify({ ok: true, lead, recordedToSheet: webhookSuccess }),
+      JSON.stringify({
+        ok: true,
+        lead: {
+          ...lead,
+          sheet: gasData.sheet || "Leads",
+          rowNumber: gasData.rowNumber
+        },
+        recordedToSheet: true
+      }),
       { status: 200, headers: { "Content-Type": "application/json" } }
     );
   } catch (err: any) {
