@@ -1,16 +1,27 @@
 {
-  "name": "healthfoundry-landing",
+  "name": "hf-gtm-monorepo",
+  "private": true,
   "type": "module",
   "version": "0.0.1",
   "engines": {
     "node": ">=22.23.4"
   },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "generate-types": "wrangler types"
+    "generate-types": "wrangler types",
+    "dev:landing": "npm run dev --workspace=@hf/landing",
+    "dev:score": "npm run dev --workspace=@hf/social-score",
+    "dev:lead": "npm run dev --workspace=@hf/lead",
+    "build:landing": "npm run build --workspace=@hf/landing",
+    "build:score": "npm run build --workspace=@hf/social-score",
+    "build:lead": "npm run build --workspace=@hf/lead"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^14.4.9",

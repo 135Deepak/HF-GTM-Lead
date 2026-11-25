@@ -1,0 +1,13 @@
+{
+  "name": "@hf/shared",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./layouts/*": "./src/layouts/*",
+    "./components/*": "./src/components/*",
+    "./lib/*": "./src/lib/*",
+    "./styles/*": "./src/styles/*",
+    "./assets/*": "./src/assets/*"
+  }
+}
