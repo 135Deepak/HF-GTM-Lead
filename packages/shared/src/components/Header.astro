@@ -6,11 +6,16 @@ interface Props {
   leadUrl?: string;
 }
 
+const isDev = import.meta.env.DEV;
+const defaultLanding = isDev ? "http://localhost:4321" : (import.meta.env.PUBLIC_LANDING_URL || "/");
+const defaultSocial = isDev ? "http://localhost:4322" : (import.meta.env.PUBLIC_SOCIAL_SCORE_URL || "/social-score");
+const defaultLead = isDev ? "http://localhost:4323" : (import.meta.env.PUBLIC_LEAD_URL || "/lead");
+
 const {
   currentPath = Astro.url.pathname,
-  landingUrl = import.meta.env.PUBLIC_LANDING_URL || "/",
-  socialScoreUrl = import.meta.env.PUBLIC_SOCIAL_SCORE_URL || "/social-score",
-  leadUrl = import.meta.env.PUBLIC_LEAD_URL || "/lead"
+  landingUrl = defaultLanding,
+  socialScoreUrl = defaultSocial,
+  leadUrl = defaultLead
 } = Astro.props;
 
 const normalizedPath = currentPath.replace(/\/$/, "") || "/";
@@ -21,15 +26,16 @@ const normalizedPath = currentPath.replace(/\/$/, "") || "/";
       <img class="logo-light" src="/assets/logo-wordmark-horizontal.jpg" alt="HealthFoundry" />
       <img class="logo-dark" src="/assets/logo-wordmark-horizontal.jpg" alt="HealthFoundry" />
     </a>
-    <nav class="gtm-nav" id="mainNav" aria-label="Tools">
-      <a href={socialScoreUrl} class={normalizedPath === "/social-score" ? "active" : ""}>Score your brand</a>
+    <nav class="gtm-nav" id="mainNav" aria-label="Navigation">
+      <a href={landingUrl} class={normalizedPath === "/" ? "active" : ""}>Home</a>
+      <a href={socialScoreUrl} class={normalizedPath === "/social-score" ? "active" : ""}>Social score</a>
       <a href={leadUrl} class={normalizedPath === "/lead" ? "active" : ""}>Talk to us</a>
     </nav>
-    <button class="gtm-iconbtn" id="themeToggle" aria-label="Toggle dark mode">
+    <button class="gtm-iconbtn" id="themeToggle" aria-label="Toggle dark mode" type="button">
       <svg class="i-sun"><use href="#i-sun"/></svg>
       <svg class="i-moon"><use href="#i-moon"/></svg>
     </button>
-    <button class="gtm-hamburger" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">
+    <button class="gtm-hamburger" id="navToggle" aria-label="Toggle navigation" aria-expanded="false" type="button">
       <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round">
         <line x1="3" y1="6" x2="17" y2="6"/>
         <line x1="3" y1="10" x2="17" y2="10"/>

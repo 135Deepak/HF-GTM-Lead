@@ -2,18 +2,35 @@
 import MainLayout from "@hf/shared/layouts/MainLayout.astro";
 import { LeadForm } from "../components/LeadForm";
 
-const landingUrl = import.meta.env.PUBLIC_LANDING_URL || "http://localhost:4321";
+const isDev = import.meta.env.DEV;
+const landingUrl = isDev ? "http://localhost:4321" : (import.meta.env.PUBLIC_LANDING_URL || "/");
+const socialScoreUrl = isDev ? "http://localhost:4322" : (import.meta.env.PUBLIC_SOCIAL_SCORE_URL || "/social-score");
+const leadUrl = isDev ? "http://localhost:4323" : (import.meta.env.PUBLIC_LEAD_URL || "/lead");
 ---
 
-<MainLayout title="Consult with Healthcare Specialists — HealthFoundry" currentPath="/lead">
+<MainLayout
+  title="Consult with Healthcare Specialists — HealthFoundry"
+  currentPath="/lead"
+  landingUrl={landingUrl}
+  socialScoreUrl={socialScoreUrl}
+  leadUrl={leadUrl}
+>
   <section class="view active" data-view="/lead">
-    <div class="gtm-container">
-      <div class="page-head">
-        <a href={landingUrl} class="back"><svg><use href="#i-arrowLeft"/></svg>All tools</a>
-        <h1>Consult with Our Healthcare GTM Team</h1>
-        <p>Tell us what you're trying to solve. Our specialists will map your needs to Vital360, VitalStatistix, or VitalRails — and get back to you within one business day.</p>
+    <div class="page-band sky grid-surface">
+      <div class="sky-drift page-band-drift" aria-hidden="true">
+        <div class="drifter pb-d1"><svg viewBox="0 0 3 3" shape-rendering="crispEdges" fill="currentColor"><rect x="1" y="0" width="1" height="3"/><rect x="0" y="1" width="3" height="1"/></svg></div>
+        <div class="drifter pb-d2"><svg viewBox="0 0 3 3" shape-rendering="crispEdges" fill="currentColor"><rect x="1" y="0" width="1" height="3"/><rect x="0" y="1" width="3" height="1"/></svg></div>
       </div>
+      <div class="page-band-inner">
+        <a href={landingUrl} class="back" aria-label="Back to Home"><svg><use href="#i-arrowLeft"/></svg>Back to Home</a>
+        <div class="hf-overline" style="margin-bottom:12px">talk to us · 1 min</div>
+        <h1>Talk to our team</h1>
+        <p>A few quick questions so the right specialist reaches out, ready with ideas for your organization.</p>
+      </div>
+      <div class="horizon"></div>
+    </div>
 
+    <div class="gtm-container tool-wrap">
       <LeadForm client:load />
     </div>
   </section>

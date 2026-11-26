@@ -1,10 +1,57 @@
 ---
-// Shared footer matching template exactly
+interface Props {
+  landingUrl?: string;
+  socialScoreUrl?: string;
+  leadUrl?: string;
+}
+
+const isDev = import.meta.env.DEV;
+const defaultLanding = isDev ? "http://localhost:4321" : (import.meta.env.PUBLIC_LANDING_URL || "/");
+const defaultSocial = isDev ? "http://localhost:4322" : (import.meta.env.PUBLIC_SOCIAL_SCORE_URL || "/social-score");
+const defaultLead = isDev ? "http://localhost:4323" : (import.meta.env.PUBLIC_LEAD_URL || "/lead");
+
+const {
+  landingUrl = defaultLanding,
+  socialScoreUrl = defaultSocial,
+  leadUrl = defaultLead
+} = Astro.props;
 ---
 <footer class="gtm-footer">
-  <div class="gtm-container">
-    <span>© 2026 HealthFoundry.ai</span>
-    <span>Powered by HealthFoundry Applied Intelligence Platform · <a href="https://healthfoundry.ai" target="_blank" rel="noopener noreferrer">healthfoundry.ai</a></span>
+  <div class="footer-inner">
+    <div>
+      <a href={landingUrl} class="gtm-logo" aria-label="HealthFoundry home">
+        <img class="logo-light" src="/assets/logo-wordmark-horizontal.jpg" alt="HealthFoundry" />
+        <img class="logo-dark" src="/assets/logo-wordmark-horizontal.jpg" alt="HealthFoundry" />
+      </a>
+      <p class="footer-blurb">Operational intelligence for healthcare organizations — from patient acquisition to clinical growth command centers.</p>
+    </div>
+    <div class="footer-col">
+      <h2>Navigation</h2>
+      <ul>
+        <li><a href={landingUrl}>Home</a></li>
+        <li><a href={socialScoreUrl}>Social media score</a></li>
+        <li><a href={leadUrl}>Talk to our team</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h2>Company</h2>
+      <ul>
+        <li><a href="https://healthfoundry.ai" target="_blank" rel="noopener noreferrer">About</a></li>
+        <li><a href="https://healthfoundry.ai" target="_blank" rel="noopener noreferrer">Platform</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h2>Solutions</h2>
+      <ul>
+        <li><a href="https://healthfoundry.ai" target="_blank" rel="noopener noreferrer">Vital360</a></li>
+        <li><a href="https://healthfoundry.ai" target="_blank" rel="noopener noreferrer">VitalStatistix</a></li>
+        <li><a href="https://healthfoundry.ai" target="_blank" rel="noopener noreferrer">VitalRails</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-base">
+    <div>© 2026 HealthFoundry.ai</div>
+    <div>Powered by HealthFoundry Applied Intelligence Platform</div>
   </div>
 </footer>
 

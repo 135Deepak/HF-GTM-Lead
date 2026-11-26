@@ -31,8 +31,6 @@ export const LeadForm: React.FC = () => {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [leadError, setLeadError] = useState<string>("");
   const [leadSuccess, setLeadSuccess] = useState<boolean>(false);
-  const [sheetRowData, setSheetRowData] = useState<any>(null);
-  const [recordedToSheet, setRecordedToSheet] = useState<boolean>(false);
 
   const [lastScore, setLastScore] = useState<ScoreData | null>(null);
 
@@ -103,17 +101,27 @@ export const LeadForm: React.FC = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleNextOrSubmit = async (e: React.FormEvent) => {
+  const handleNextStep = () => {
+    if (validateStep(lstep)) {
+      setLstep(prev => prev + 1);
+    }
+  };
+
+  const handleBackStep = () => {
+    if (lstep > 0) {
+      setLstep(prev => prev - 1);
+      setLeadError("");
+    }
+  };
+
+  const handleSubmitLead = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (lstep < 2) {
-      if (validateStep(lstep)) {
-        setLstep(lstep + 1);
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      }
+    if (lstep < LEAD_STEPS.length) {
+      handleNextStep();
       return;
     }
 
-    // Step 2 submission
+    // Step 2 validation
     const errors: Record<string, string> = {};
     if (!details.name.trim()) errors.name = "Required";
     if (!details.company.trim()) errors.company = "Required";
@@ -133,20 +141,14 @@ export const LeadForm: React.FC = () => {
       return;
     }
 
-    if (!consent) {
-      showToast("Please agree to be contacted");
-      return;
-    }
-
     setSubmitting(true);
     setLeadError("");
 
-    const score = getLastScore();
     const payload = {
       ...details,
       ...leadAns,
       message,
-      socialScore: score ? `${score.score} (${score.label})` : ""
+      socialScore: lastScore?.score ?? null
     };
 
     try {
@@ -155,256 +157,198 @@ export const LeadForm: React.FC = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
-
       const data = await res.json().catch(() => null);
       if (!res.ok || !data?.ok) {
-        setLeadError(data?.reason || "Failed to record consultation request in Google Sheets. Please try again.");
+        setLeadError(data?.reason || "Something went wrong sending your request. Please try again.");
         setSubmitting(false);
         return;
       }
-
-      saveDetails({ ...details, source: "lead" });
-      setSheetRowData(data.lead);
-      setRecordedToSheet(true);
-      setLeadSuccess(true);
-      showToast("Response recorded to Google Sheet");
     } catch {
-      setLeadError("Unable to reach the server to save your request in Google Sheets. Please check your connection and try again.");
-    } finally {
+      setLeadError("Unable to reach the server to submit your request. Please check your connection and try again.");
       setSubmitting(false);
+      return;
     }
+
+    const savedDetails: VisitorDetails = { ...details, source: "lead" };
+    saveDetails(savedDetails);
+    setSubmitting(false);
+    setLeadSuccess(true);
+    showToast("Consultation request recorded to Google Sheet");
   };
 
   const handleResetForm = () => {
     setLeadAns({});
     setMessage("");
     setConsent(false);
-    setStepErrors({});
-    setDetailErrors({});
-    setLeadError("");
-    setLeadSuccess(false);
-    setSheetRowData(null);
     setLstep(0);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    setLeadSuccess(false);
+    setLeadError("");
   };
 
-  const firstName = details.name.split(/\s+/)[0] || details.name;
+  const firstName = details.name ? details.name.trim().split(" ")[0] : "there";
+  const isDev = import.meta.env.DEV;
+  const landingUrl = isDev ? "http://localhost:4321" : (import.meta.env.PUBLIC_LANDING_URL || "/");
+  const socialScoreUrl = isDev ? "http://localhost:4322" : (import.meta.env.PUBLIC_SOCIAL_SCORE_URL || "/social-score");
 
   return (
     <div className="tool-layout">
       <div>
-        {!leadSuccess && (
-          <div className="stepper" id="leadStepper">
-            <div className={`step ${lstep > 0 ? "done" : lstep === 0 ? "current" : ""}`}>
-              <span>1. Your organization</span>
-              <div className="bar">
-                <i></i>
-              </div>
-            </div>
-            <div className={`step ${lstep > 1 ? "done" : lstep === 1 ? "current" : ""}`}>
-              <span>2. Your needs</span>
-              <div className="bar">
-                <i></i>
-              </div>
-            </div>
-            <div className={`step ${lstep === 2 ? "current" : ""}`}>
-              <span>3. Your details</span>
-              <div className="bar">
-                <i></i>
-              </div>
+        <div className="stepper" id="leadStepper">
+          <div className={`step ${lstep > 0 ? "done" : lstep === 0 ? "current" : ""}`}>
+            <span>1. Your organization</span>
+            <div className="bar">
+              <i style={{ width: lstep > 0 ? "100%" : "50%" }}></i>
             </div>
           </div>
-        )}
+          <div className={`step ${lstep > 1 ? "done" : lstep === 1 ? "current" : ""}`}>
+            <span>2. Your needs</span>
+            <div className="bar">
+              <i style={{ width: lstep > 1 ? "100%" : lstep === 1 ? "50%" : "0%" }}></i>
+            </div>
+          </div>
+          <div className={`step ${lstep === 2 ? "current" : ""}`}>
+            <span>3. Your details</span>
+            <div className="bar">
+              <i style={{ width: lstep === 2 ? "50%" : "0%" }}></i>
+            </div>
+          </div>
+        </div>
 
         {!leadSuccess ? (
           <div className="panel" id="leadPanel">
-            <form id="leadForm" onSubmit={handleNextOrSubmit} noValidate>
+            <form id="leadForm" onSubmit={handleSubmitLead} noValidate>
               <div className="panel-body">
-                {/* Step 0: Your organization */}
-                <div data-lstep="0" className={lstep === 0 ? "" : "hidden"}>
-                  {LEAD_STEPS[0].map(q => (
-                    <div className="qblock" data-q={q.id} key={q.id}>
-                      <div className="qlabel">
-                        {q.label}
-                        {q.hint ? <span className="opt"> — {q.hint}</span> : null}
-                      </div>
-
-                      {q.type === "pills" ? (
-                        <div className="pills">
-                          {q.opts.map(o => {
-                            const isSel = leadAns[q.id] === o;
-                            return (
-                              <button
-                                key={o}
-                                type="button"
-                                className={`pill ${isSel ? "selected" : ""}`}
-                                data-v={o}
-                                aria-pressed={isSel}
-                                onClick={() => handleSelectRadio(q.id, o)}
-                              >
-                                {o}
-                              </button>
-                            );
-                          })}
+                {lstep < LEAD_STEPS.length ? (
+                  <div>
+                    {LEAD_STEPS[lstep].map(q => (
+                      <div className="qblock" key={q.id}>
+                        <div className="qlabel">
+                          {q.label}
+                          {q.type === "multi" && (
+                            <span className="opt"> (select all that apply)</span>
+                          )}
                         </div>
-                      ) : (
-                        <div className={`options ${q.cols2 ? "cols2" : ""}`}>
-                          {q.opts.map(o => {
-                            const isSel = leadAns[q.id] === o;
-                            return (
-                              <button
-                                key={o}
-                                type="button"
-                                className={`option ${isSel ? "selected" : ""}`}
-                                data-v={o}
-                                aria-pressed={isSel}
-                                onClick={() => handleSelectRadio(q.id, o)}
-                              >
-                                <span className="radio"></span>
-                                <span>{o}</span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      )}
 
-                      {stepErrors[q.id] ? (
-                        <div className="qerr">
-                          <svg>
-                            <use href="#i-alert" />
-                          </svg>
-                          {stepErrors[q.id]}
-                        </div>
-                      ) : null}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Step 1: Your needs */}
-                <div data-lstep="1" className={lstep === 1 ? "" : "hidden"}>
-                  {LEAD_STEPS[1].map(q => (
-                    <div className="qblock" data-q={q.id} key={q.id}>
-                      <div className="qlabel">
-                        {q.label}
-                        {q.hint ? <span className="opt"> — {q.hint}</span> : null}
-                      </div>
-
-                      {q.type === "pills" ? (
-                        <div className="pills">
-                          {q.opts.map(o => {
-                            const isSel = leadAns[q.id] === o;
-                            return (
-                              <button
-                                key={o}
-                                type="button"
-                                className={`pill ${isSel ? "selected" : ""}`}
-                                data-v={o}
-                                aria-pressed={isSel}
-                                onClick={() => handleSelectRadio(q.id, o)}
-                              >
-                                {o}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      ) : (
-                        <div className={`options ${q.cols2 ? "cols2" : ""}`}>
-                          {q.opts.map(o => {
-                            const isSel =
-                              q.type === "multi"
-                                ? (leadAns[q.id] || []).includes(o)
-                                : leadAns[q.id] === o;
-                            return (
-                              <button
-                                key={o}
-                                type="button"
-                                className={`option ${isSel ? "selected" : ""}`}
-                                data-v={o}
-                                aria-pressed={isSel}
-                                onClick={() =>
-                                  q.type === "multi"
-                                    ? handleToggleMulti(q.id, o)
-                                    : handleSelectRadio(q.id, o)
-                                }
-                              >
-                                {q.type === "multi" ? (
-                                  <span className="box">
-                                    <svg>
-                                      <use href="#i-check" />
+                        {q.type === "pills" ? (
+                          <div className="pills">
+                            {q.opts.map(opt => {
+                              const isSelected = leadAns[q.id] === opt;
+                              return (
+                                <button
+                                  key={opt}
+                                  type="button"
+                                  className={`pill ${isSelected ? "selected" : ""}`}
+                                  onClick={() => handleSelectRadio(q.id, opt)}
+                                >
+                                  {opt}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        ) : q.type === "multi" ? (
+                          <div className={`options ${q.cols2 ? "cols2" : ""}`}>
+                            {q.opts.map(opt => {
+                              const isSelected = (leadAns[q.id] || []).includes(opt);
+                              return (
+                                <button
+                                  key={opt}
+                                  type="button"
+                                  className={`option ${isSelected ? "selected" : ""}`}
+                                  onClick={() => handleToggleMulti(q.id, opt)}
+                                >
+                                  <span className="box" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                      <polyline points="20 6 9 17 4 12" />
                                     </svg>
                                   </span>
-                                ) : (
-                                  <span className="radio"></span>
-                                )}
-                                <span>{o}</span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      )}
+                                  <span>{opt}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          <div className={`options ${q.cols2 ? "cols2" : ""}`} role="radiogroup">
+                            {q.opts.map(opt => {
+                              const isSelected = leadAns[q.id] === opt;
+                              return (
+                                <button
+                                  key={opt}
+                                  type="button"
+                                  className={`option ${isSelected ? "selected" : ""}`}
+                                  role="radio"
+                                  aria-checked={isSelected}
+                                  onClick={() => handleSelectRadio(q.id, opt)}
+                                >
+                                  <span className="radio" aria-hidden="true"></span>
+                                  <span>{opt}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
 
-                      {stepErrors[q.id] ? (
-                        <div className="qerr">
-                          <svg>
-                            <use href="#i-alert" />
-                          </svg>
-                          {stepErrors[q.id]}
-                        </div>
-                      ) : null}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Step 2: Your details */}
-                <div data-lstep="2" className={lstep === 2 ? "" : "hidden"}>
-                  <PersonalDetails
-                    idPrefix="lead"
-                    values={details}
-                    onChange={handleFieldChange}
-                    errors={detailErrors}
-                    isEditing={isEditing}
-                    setIsEditing={setIsEditing}
-                    hasHydratedFromStore={hasHydrated}
-                  />
-
-                  <div className="fields" style={{ marginTop: "var(--space-6)" }}>
-                    <div className="f">
-                      <label htmlFor="lead-message">
-                        Anything else we should know?{" "}
-                        <span style={{ color: "hsl(var(--muted-foreground))", fontWeight: 400 }}>
-                          (optional)
-                        </span>
-                      </label>
-                      <textarea
-                        className="textarea"
-                        id="lead-message"
-                        name="message"
-                        placeholder="Current clinical volume goals, software tools, target service lines…"
-                        value={message}
-                        onChange={e => setMessage(e.target.value)}
-                      ></textarea>
-                    </div>
-                    <label className="checkline">
-                      <input
-                        type="checkbox"
-                        id="lead-consent"
-                        checked={consent}
-                        onChange={e => setConsent(e.target.checked)}
-                      />
-                      I agree to HealthFoundry contacting me about this request. We never share your
-                      details.
-                    </label>
+                        {stepErrors[q.id] && (
+                          <div className="qerr">
+                            <svg>
+                              <use href="#i-alert" />
+                            </svg>
+                            <span>{stepErrors[q.id]}</span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
+                ) : (
+                  <div>
+                    <PersonalDetails
+                      idPrefix="lead"
+                      values={details}
+                      onChange={handleFieldChange}
+                      errors={detailErrors}
+                      isEditing={isEditing}
+                      setIsEditing={setIsEditing}
+                      hasHydratedFromStore={hasHydrated}
+                    />
 
-                  {leadError ? (
-                    <div className="callout error" style={{ marginTop: "var(--space-5)" }}>
-                      <svg>
-                        <use href="#i-alert" />
-                      </svg>
-                      <span>{leadError}</span>
+                    <div className="fields" style={{ marginTop: "var(--space-6)" }}>
+                      <div className="f">
+                        <label htmlFor="lead-message">
+                          Anything else we should know?{" "}
+                          <span style={{ color: "hsl(var(--muted-foreground))", fontWeight: 400 }}>
+                            (optional)
+                          </span>
+                        </label>
+                        <textarea
+                          className="textarea"
+                          id="lead-message"
+                          name="message"
+                          value={message}
+                          onChange={e => setMessage(e.target.value)}
+                          placeholder="Clinical growth goals, current marketing tools, upcoming service launches…"
+                        ></textarea>
+                      </div>
+
+                      <label className="checkline">
+                        <input
+                          type="checkbox"
+                          id="lead-consent"
+                          checked={consent}
+                          onChange={e => setConsent(e.target.checked)}
+                        />
+                        I agree to HealthFoundry contacting me about this request. We never share your details.
+                      </label>
                     </div>
-                  ) : null}
-                </div>
+
+                    {leadError ? (
+                      <div className="callout error" id="leadError" style={{ marginTop: "var(--space-5)" }}>
+                        <svg>
+                          <use href="#i-alert" />
+                        </svg>
+                        <span>{leadError}</span>
+                      </div>
+                    ) : null}
+                  </div>
+                )}
               </div>
 
               <div className="panel-foot">
@@ -413,7 +357,7 @@ export const LeadForm: React.FC = () => {
                   type="button"
                   id="leadBack"
                   style={{ visibility: lstep === 0 ? "hidden" : "visible" }}
-                  onClick={() => setLstep(Math.max(0, lstep - 1))}
+                  onClick={handleBackStep}
                 >
                   <svg>
                     <use href="#i-arrowLeft" />
@@ -465,20 +409,16 @@ export const LeadForm: React.FC = () => {
                 <button className="hf-btn outline" onClick={handleResetForm} type="button">
                   Submit another response
                 </button>
-                <a className="hf-btn primary" href={import.meta.env.PUBLIC_SOCIAL_SCORE_URL || "/social-score"}>
+                <a className="hf-btn outline" href={landingUrl}>
+                  Back to Home
+                </a>
+                <a className="hf-btn primary" href={socialScoreUrl}>
                   Check your social score
                   <svg>
                     <use href="#i-arrow" />
                   </svg>
                 </a>
               </div>
-              {sheetRowData ? (
-                <div className="payload" id="leadPayload">
-                  {`// Confirmed saved to Google Sheet (${sheetRowData.sheet || "Leads"} tab, row #${sheetRowData.rowNumber || ""}):\n` +
-                    `// "fit" is internal — computed server-side, never shown to the visitor\n` +
-                    JSON.stringify(sheetRowData, null, 2)}
-                </div>
-              ) : null}
             </div>
           </div>
         )}
@@ -518,7 +458,7 @@ export const LeadForm: React.FC = () => {
                   {lastScore.score}
                 </span>
                 <div>
-                  <div style={{ fontSize: "var(--fs-xs)", fontWeight: 500 }}>Social media score</div>
+                  <div style={{ fontSize: "var(--text-xs)", fontWeight: 500 }}>Social media score</div>
                   <span
                     className={`band ${lastScore.band}`}
                     id="miniBand"

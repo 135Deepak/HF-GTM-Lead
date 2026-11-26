@@ -35,7 +35,6 @@ export const SocialScoreAssessment: React.FC = () => {
   const [displayScore, setDisplayScore] = useState<number>(0);
   const [animatedOffset, setAnimatedOffset] = useState<number>(326.73);
   const [barsAnimated, setBarsAnimated] = useState<boolean>(false);
-  const [payloadJson, setPayloadJson] = useState<string>("");
 
   useEffect(() => {
     const saved = getDetails();
@@ -108,8 +107,6 @@ export const SocialScoreAssessment: React.FC = () => {
     const completeAnswers = answers.map(a => a ?? 0);
     const result = computeScore(completeAnswers);
 
-    let savedRowData: any = null;
-
     try {
       const res = await fetch("/api/assessment", {
         method: "POST",
@@ -125,11 +122,6 @@ export const SocialScoreAssessment: React.FC = () => {
         setCalculating(false);
         return;
       }
-      savedRowData = data.row;
-      setPayloadJson(
-        `// Confirmed saved to Google Sheet (${data.row?.sheet || "Assessments"} tab, row #${data.row?.rowNumber || ""}):\n` +
-          JSON.stringify(data.row, null, 2)
-      );
     } catch {
       setGateError("Unable to reach the server to save your assessment to Google Sheets. Please check your connection and try again.");
       setCalculating(false);
@@ -193,19 +185,23 @@ export const SocialScoreAssessment: React.FC = () => {
         <div className={`step ${step > 0 ? "done" : step === 0 ? "current" : ""}`}>
           <span>1. Questions</span>
           <div className="bar">
-            <i></i>
+            <i
+              style={{
+                width: step > 0 ? "100%" : `${Math.round(((qi + 1) / QUESTIONS.length) * 100)}%`
+              }}
+            ></i>
           </div>
         </div>
         <div className={`step ${step > 1 ? "done" : step === 1 ? "current" : ""}`}>
           <span>2. Your details</span>
           <div className="bar">
-            <i></i>
+            <i style={{ width: step > 1 ? "100%" : step === 1 ? "50%" : "0%" }}></i>
           </div>
         </div>
-        <div className={`step ${step === 2 ? "current" : ""}`}>
+        <div className={`step ${step === 2 ? "current done" : ""}`}>
           <span>3. Your score</span>
           <div className="bar">
-            <i></i>
+            <i style={{ width: step === 2 ? "100%" : "0%" }}></i>
           </div>
         </div>
       </div>
@@ -218,11 +214,7 @@ export const SocialScoreAssessment: React.FC = () => {
               <span className="hf-overline" id="qCategory">
                 {currentQ.cat}
               </span>
-              <span
-                className="hf-num"
-                style={{ fontSize: "var(--fs-xs)", color: "hsl(var(--muted-foreground))" }}
-                id="qCount"
-              >
+              <span className="q-count hf-num" id="qCount">
                 {qi + 1} / {QUESTIONS.length}
               </span>
             </div>
@@ -241,7 +233,7 @@ export const SocialScoreAssessment: React.FC = () => {
                     aria-checked={isSelected}
                     onClick={() => handleSelectOption(weight)}
                   >
-                    <span className="radio"></span>
+                    <span className="radio" aria-hidden="true"></span>
                     <span>{label}</span>
                   </button>
                 );
@@ -281,11 +273,11 @@ export const SocialScoreAssessment: React.FC = () => {
           <form className="panel-body" id="gateForm" onSubmit={handleGateSubmit} noValidate>
             <div className="locked" aria-hidden="true">
               <div className="blur">
-                <div style={{ fontSize: "2.5rem", fontWeight: 600 }}>72</div>
+                <div style={{ fontSize: "2.5rem", fontWeight: 700 }}>72</div>
                 <div>
                   <div className="band strong">Strong</div>
-                  <p style={{ marginTop: "8px", fontSize: "var(--fs-sm)" }}>
-                    Your social presence is ahead of most peers…
+                  <p style={{ marginTop: "8px", fontSize: "var(--text-body-sm)" }}>
+                    Your social presence is ahead of most healthcare peers…
                   </p>
                 </div>
               </div>
@@ -432,24 +424,22 @@ export const SocialScoreAssessment: React.FC = () => {
                 </div>
               ))}
             </div>
-
-            <details className="mock-row">
-              <summary>Response recorded: sheet ledger row</summary>
-              <div className="payload" id="assessmentPayload">
-                {payloadJson}
-              </div>
-            </details>
           </div>
           <div className="panel-foot">
             <button className="hf-btn ghost" id="retake" onClick={handleRetake}>
               Retake assessment
             </button>
-            <a className="hf-btn primary" href={import.meta.env.PUBLIC_LEAD_URL || "/lead"}>
-              Talk to an expert
-              <svg>
-                <use href="#i-arrow" />
-              </svg>
-            </a>
+            <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+              <a className="hf-btn outline" href={import.meta.env.DEV ? "http://localhost:4321" : (import.meta.env.PUBLIC_LANDING_URL || "/")}>
+                Back to Home
+              </a>
+              <a className="hf-btn primary" href={import.meta.env.DEV ? "http://localhost:4323" : (import.meta.env.PUBLIC_LEAD_URL || "/lead")}>
+                Talk to an expert
+                <svg>
+                  <use href="#i-arrow" />
+                </svg>
+              </a>
+            </div>
           </div>
         </div>
       )}

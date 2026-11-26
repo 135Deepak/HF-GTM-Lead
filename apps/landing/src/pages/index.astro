@@ -1,78 +1,179 @@
 ---
 import MainLayout from "@hf/shared/layouts/MainLayout.astro";
 
-const socialScoreUrl = import.meta.env.PUBLIC_SOCIAL_SCORE_URL || "http://localhost:4322";
-const leadUrl = import.meta.env.PUBLIC_LEAD_URL || "http://localhost:4323";
+const isDev = import.meta.env.DEV;
+const landingUrl = isDev ? "http://localhost:4321" : (import.meta.env.PUBLIC_LANDING_URL || "/");
+const socialScoreUrl = isDev ? "http://localhost:4322" : (import.meta.env.PUBLIC_SOCIAL_SCORE_URL || "/social-score");
+const leadUrl = isDev ? "http://localhost:4323" : (import.meta.env.PUBLIC_LEAD_URL || "/lead");
 ---
 
-<MainLayout title="HealthFoundry — Intelligent Healthcare Growth Tools">
+<MainLayout
+  title="HealthFoundry — Intelligent Healthcare Growth Tools"
+  currentPath="/"
+  landingUrl={landingUrl}
+  socialScoreUrl={socialScoreUrl}
+  leadUrl={leadUrl}
+>
   <section class="view active" data-view="/">
-    <div class="gtm-container">
-      <div class="hero">
-        <div class="hf-overline">Healthcare Growth Intelligence · Patient Acquisition Platform</div>
-        <h1>Turn your healthcare presence into <em>measurable patient growth.</em></h1>
-        <p>Purpose-built intelligence tools for healthcare systems, specialty practices, and diagnostic networks. Benchmark your digital authority in 3 minutes or collaborate with our healthcare growth specialists.</p>
+    <!-- Hero: graph-paper sky, drifting pixel crosses, pixel HF mark, dither edge -->
+    <div class="hero sky grid-surface">
+      <div class="sky-drift" aria-hidden="true">
+        <div class="drifter d1"><svg viewBox="0 0 3 3" shape-rendering="crispEdges" fill="currentColor"><rect x="1" y="0" width="1" height="3"/><rect x="0" y="1" width="3" height="1"/></svg></div>
+        <div class="drifter d2"><svg viewBox="0 0 3 3" shape-rendering="crispEdges" fill="currentColor"><rect x="1" y="0" width="1" height="3"/><rect x="0" y="1" width="3" height="1"/></svg></div>
+        <div class="drifter d3"><svg viewBox="0 0 3 3" shape-rendering="crispEdges" fill="currentColor"><rect x="1" y="0" width="1" height="3"/><rect x="0" y="1" width="3" height="1"/></svg></div>
+        <div class="drifter d4"><svg viewBox="0 0 3 3" shape-rendering="crispEdges" fill="currentColor"><rect x="1" y="0" width="1" height="3"/><rect x="0" y="1" width="3" height="1"/></svg></div>
+        <div class="drifter d5"><svg viewBox="0 0 3 3" shape-rendering="crispEdges" fill="currentColor"><rect x="1" y="0" width="1" height="3"/><rect x="0" y="1" width="3" height="1"/></svg></div>
       </div>
-
-      <div class="tool-grid">
-        <a class="tool-card" href={socialScoreUrl}>
-          <div class="tool-icon">
-            <svg><use href="#i-gauge"/></svg>
+      <div class="hero-inner">
+        <div class="hero-text">
+          <div class="hf-overline">for healthcare growth teams</div>
+          <h1>See where you stand.<br /><em>Then grow it.</em></h1>
+          <p class="lede">Benchmark your organization's social media presence in three minutes, or tell us what you're working on and a HealthFoundry specialist will come back with ideas.</p>
+          <div class="hero-actions">
+            <a class="hf-btn primary" href={socialScoreUrl}>Get my score</a>
+            <a class="hf-btn" href={leadUrl}>Talk to our team</a>
           </div>
-          <div class="tool-meta">
-            <span class="chip teal">
-              <svg width="12" height="12"><use href="#i-clock"/></svg>3 min
-            </span>
-            <span class="chip">Growth Benchmark</span>
-          </div>
-          <h2>Healthcare Social Media Index</h2>
-          <p>Evaluate your brand across six clinical growth pillars — from doctor-patient storytelling and cadence to HIPAA-conscious governance and referral attribution. Instant score and tactical next steps.</p>
-          <span class="cta">
-            Start benchmark <svg><use href="#i-arrow"/></svg>
-          </span>
-        </a>
-
-        <a class="tool-card" href={leadUrl}>
-          <div class="tool-icon">
-            <svg><use href="#i-users"/></svg>
-          </div>
-          <div class="tool-meta">
-            <span class="chip teal">
-              <svg width="12" height="12"><use href="#i-clock"/></svg>1 min
-            </span>
-            <span class="chip">Growth Consultation</span>
-          </div>
-          <h2>Connect with Growth Specialists</h2>
-          <p>Tell us what you're solving — patient acquisition, physician referrals, clinical brand authority, or conversion analytics. Receive a tailored GTM walkthrough and actionable next steps.</p>
-          <span class="cta">
-            Request consultation <svg><use href="#i-arrow"/></svg>
-          </span>
-        </a>
-      </div>
-
-      <div class="trust">
-        <span><svg><use href="#i-shieldCheck"/></svg>Verified healthcare organizations only</span>
-        <span><svg><use href="#i-checkCircle"/></svg>Zero spam · HIPAA-safe data handling</span>
-        <span><svg><use href="#i-checkCircle"/></svg>Instant diagnostic results in your browser</span>
-      </div>
-
-      <div class="platform-strip">
-        <div class="platform-item">
-          <div class="platform-icon">◉</div>
-          <strong>Vital360</strong>
-          <p>Patient acquisition, retention, engagement and care continuity — powered by AI agents.</p>
+          <p class="hero-note">3 minutes · organization emails only · results in your browser</p>
         </div>
-        <div class="platform-item">
-          <div class="platform-icon">◆</div>
-          <strong>VitalStatistix</strong>
-          <p>Revenue cycle, claims, billing and FinOps optimization for healthcare operations.</p>
-        </div>
-        <div class="platform-item">
-          <div class="platform-icon">▲</div>
-          <strong>VitalRails</strong>
-          <p>Governance, risk and compliance processes for healthcare systems and networks.</p>
+        <div class="hero-art" aria-hidden="true">
+          <svg class="pixel-mark" viewBox="-1 -1 25 20" shape-rendering="crispEdges">
+            <!-- HF mark redrawn as pixels: 6 columns x 3 rows, tallest in the middle -->
+            <rect x="0" y="4" width="2" height="3" /><rect x="0" y="8" width="2" height="3" /><rect class="spark" style="animation-delay:-1.2s" x="0" y="12" width="2" height="3" />
+            <rect class="c" x="3" y="2" width="3" height="4" /><rect x="3" y="7" width="3" height="4" /><rect class="c" x="3" y="12" width="3" height="4" />
+            <rect x="7" y="0" width="4" height="5" /><rect class="spark" x="7" y="6" width="4" height="5" /><rect x="7" y="12" width="4" height="5" />
+            <rect class="spark" style="animation-delay:-3.1s" x="12" y="0" width="4" height="5" /><rect x="12" y="6" width="4" height="5" /><rect class="c" x="12" y="12" width="4" height="5" />
+            <rect x="17" y="2" width="3" height="4" /><rect x="17" y="7" width="3" height="4" /><rect class="c" x="17" y="12" width="3" height="4" />
+            <rect x="21" y="4" width="2" height="3" /><rect class="c" x="21" y="8" width="2" height="3" /><rect class="c" x="21" y="12" width="2" height="3" />
+          </svg>
         </div>
       </div>
+      <div class="horizon"></div>
     </div>
+
+    <!-- Statement: why this exists -->
+    <section class="section statement">
+      <p class="hf-overline">why this exists</p>
+      <p class="statement-text">Patients pick providers the way they pick everything else now: they search, they scroll, they ask around online. Most healthcare organizations can't say how they're doing there.</p>
+      <p class="statement-text">So we made a quick, honest way to find out — and a direct line to people who fix it for a living.</p>
+    </section>
+
+    <!-- Two paths: Self-assessment and Talk to us -->
+    <section class="section paths">
+      <div class="paths-inner">
+        <p class="hf-overline">the tools</p>
+        <h2 class="section-title">Two ways to start.</h2>
+        <p class="section-lede">Take the assessment for a quick benchmark, or skip straight to a conversation. Your details carry over between them.</p>
+        <div class="path-grid">
+          <article class="path featured">
+            <div class="path-number">01 · Self-assessment</div>
+            <h3>Know your social media score</h3>
+            <p class="path-body">Clinical growth diagnostic covering your footprint, publishing cadence, and governance.</p>
+            <ul class="points">
+              <li>A score out of 100 and a maturity band</li>
+              <li>Breakdown across key clinical growth areas</li>
+              <li>Three pointers for where to focus next</li>
+            </ul>
+            <div class="path-cost">3 min · free · instant result</div>
+            <a class="hf-btn primary" href={socialScoreUrl}>
+              Start assessment
+              <svg><use href="#i-arrow" /></svg>
+            </a>
+          </article>
+          <article class="path">
+            <div class="path-number">02 · Talk to us</div>
+            <h3>Talk to our team</h3>
+            <p class="path-body">A few questions about your organization and goals, so the right specialist reaches out.</p>
+            <ul class="points">
+              <li>Patient acquisition, referrals, brand or analytics</li>
+              <li>Your social score attached, if you have one</li>
+              <li>A tailored walkthrough — no generic demo</li>
+            </ul>
+            <div class="path-cost">1 min · reply within one business day</div>
+            <a class="hf-btn" href={leadUrl}>
+              Get in touch
+              <svg><use href="#i-arrow" /></svg>
+            </a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- How it works: 4 steps and sample terminal result -->
+    <section class="section">
+      <div class="how-grid">
+        <div>
+          <p class="hf-overline">how it works</p>
+          <h2 class="section-title">Clinical insight, instant diagnostic.</h2>
+          <p class="section-lede">No login, no install. The score is calculated in your browser the moment you finish.</p>
+          <div class="howsteps">
+            <div class="howstep">
+              <span class="howstep-number">01</span>
+              <div>
+                <h3>Answer diagnostic questions</h3>
+                <p>Presence, cadence, content, engagement, measurement and governance.</p>
+              </div>
+            </div>
+            <div class="howstep">
+              <span class="howstep-number">02</span>
+              <div>
+                <h3>Unlock with your work email</h3>
+                <p>Organization emails only — no Gmail, no Yahoo. It keeps the benchmark honest.</p>
+              </div>
+            </div>
+            <div class="howstep">
+              <span class="howstep-number">03</span>
+              <div>
+                <h3>See where to focus</h3>
+                <p>Your score, your band, and pointers for your weakest areas.</p>
+              </div>
+            </div>
+            <div class="howstep">
+              <span class="howstep-number">04</span>
+              <div>
+                <h3>Talk it through, if you like</h3>
+                <p>Your score travels with your request, so the conversation starts where you are.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="code-card" aria-label="Sample result">
+          <div class="code-label">sample result · riverside health</div>
+          <pre><span class="k">score</span>       = <span class="s">72</span>
+<span class="k">band</span>        = <span class="s">"Strong"</span>
+
+<span class="m"># by area</span>
+<span class="k">presence</span>    = <span class="s">100</span>
+<span class="k">cadence</span>     = <span class="s">67</span>
+<span class="k">content</span>     = <span class="s">67</span>
+<span class="k">engagement</span>  = <span class="s">100</span>
+<span class="k">measurement</span> = <span class="s">33</span>   <span class="m"># focus here</span>
+<span class="k">governance</span>  = <span class="s">67</span></pre>
+          <a href={socialScoreUrl}>Get your own score →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Trust section: Private by default -->
+    <section class="section" style="padding-top:0">
+      <div class="trust-card">
+        <p class="hf-overline">built for healthcare</p>
+        <h2 class="section-title">Private by default.</h2>
+        <p class="section-lede">We ask for the minimum, keep it out of your browser history, and never share it.</p>
+        <div class="trust-row">
+          <div>
+            <h3>Organization emails only</h3>
+            <p>Checked as you type, and verified on our server.</p>
+          </div>
+          <div>
+            <h3>Nothing left behind</h3>
+            <p>Your details are cleared when you close the tab.</p>
+          </div>
+          <div>
+            <h3>No spam</h3>
+            <p>One specialist, one email. That's it.</p>
+          </div>
+        </div>
+      </div>
+    </section>
   </section>
 </MainLayout>
